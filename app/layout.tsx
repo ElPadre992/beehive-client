@@ -1,5 +1,8 @@
+import { AppSidebar } from "@/components/app-sidebar";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import ReactQueryProvider from "@/providers/react-query-provider";
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -7,19 +10,28 @@ export const metadata: Metadata = {
   description: "Under development!",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const cookieStore = await cookies()
+  const defaultOpen = cookieStore.get("sidebar_state")?.value === "true"
+
   return (
     <html lang="en">
       <body
         className={"font-primary antialiased"}
       >
-        <main>
-          <ReactQueryProvider>{children}</ReactQueryProvider>
-        </main>
+        <SidebarProvider defaultOpen={defaultOpen}>
+          {/* Left sidebar */}
+          <AppSidebar />
+
+          {/* Page content */}
+          <main className="flex p-4 w-full min-w-6xl bg-zinc-50">
+            <ReactQueryProvider>{children}</ReactQueryProvider>
+          </main>
+        </SidebarProvider>
       </body>
     </html>
   );

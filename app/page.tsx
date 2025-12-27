@@ -16,11 +16,11 @@ export default function Home() {
   if (error) return <p>Error: {(error as Error).message}</p>;
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
+    <div className="flex min-h-screen items-center justify-center dark:bg-black">
       <div>
         <p className="font-primary text-sm">{helloWorld} ...</p>
-        <p className="font-secondary text-xl font-semibold">{helloWorld} ...</p>
+        <h2 className="font-secondary text-xl font-semibold">{helloWorld} ...</h2>
       </div>
-    </div>
+    </div >
   );
 }
