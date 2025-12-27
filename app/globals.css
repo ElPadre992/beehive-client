@@ -5,11 +5,28 @@
   --foreground: #171717;
 }
 
+@font-face {
+  font-family: Inter;
+  src: url("/fonts/Inter-Variable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: Plex;
+  src: url("/fonts/IBMPlexSansVariable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+
+  --default-font-family: 'Inter', sans-serif;
+  --font-secondary: 'Plex', sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -22,5 +39,5 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  /* font-family: 'Inter', 'Plex', sans-serif; */
 }
