@@ -6,8 +6,6 @@ import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
-
-
 export default function InventoryItems() {
     const { data: items = [], isLoading, error } = useQuery({
         queryKey: ["inventory/items"],
@@ -21,24 +19,11 @@ export default function InventoryItems() {
     type SortKey = "name" | "sku" | "category" | "quantity" | "unit";
     type SortDirection = "asc" | "desc";
 
-
     const [search, setSearch] = useState("");
     const [categoryFilter, setCategoryFilter] = useState<string>("all");
 
-
     const [sortKey, setSortKey] = useState<SortKey>("name");
     const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
-
-
-
-    function handleSort(key: SortKey) {
-        if (key === sortKey) {
-            setSortDirection(prev => (prev === "asc" ? "desc" : "asc"));
-        } else {
-            setSortKey(key);
-            setSortDirection("asc");
-        }
-    }
 
     const filteredAndSortedItems = useMemo(() => {
         const filtered = items.filter(item => {
@@ -65,30 +50,6 @@ export default function InventoryItems() {
                 : String(bVal).localeCompare(String(aVal));
         });
     }, [items, search, categoryFilter, sortKey, sortDirection]);
-
-    function SortHeader({
-        label,
-        sortField,
-    }: {
-        label: string;
-        sortField: SortKey;
-    }) {
-        const isActive = sortKey === sortField;
-
-        return (
-            <button
-                onClick={() => handleSort(sortField)}
-                className="flex items-center gap-1 font-semibold text-left hover:underline"
-            >
-                {label}
-                {isActive && (
-                    <span className="text-xs px-3 py-2">
-                        {sortDirection === "asc" ? "▲" : "▼"}
-                    </span>
-                )}
-            </button>
-        );
-    }
 
     if (isLoading) { return <p>Loading inventory items...</p>; }
     if (error) { return <p>Error: {(error as Error).message}</p>; }
