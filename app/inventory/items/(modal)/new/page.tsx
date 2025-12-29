@@ -1,6 +1,7 @@
 "use client";
 
 import DrawerShell from "@/components/drawer-shell";
+import { FormField, SelectField } from "@/components/ui-components";
 import { useCreateInventoryItem } from "@/lib/api/inventory/items";
 import { InventoryCategoryLabel, UnitOfMeasureLabel } from "@/lib/enums/inventory/items";
 import { InventoryItemFormValues, inventoryItemSchema } from "@/lib/schemas/inventory/inventory-item.schema";
@@ -8,53 +9,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-
-// Reusable form field wrapper
-interface FormFieldProps {
-    label: string;
-    required?: boolean;
-    error?: string;
-    children: React.ReactNode;
-}
-
-function FormField({ label, required, error, children }: FormFieldProps) {
-    return (
-        <div>
-            <div className="flex items-start mt-4">
-                <label className="w-35 font-medium mt-2">
-                    {label} {required && <span className="text-red-500">*</span>}
-                </label>
-                <div className="flex-1">{children}</div>
-
-            </div>
-            {error && <p className="text-red-600 mt-2">{error}</p>}
-        </div>
-    );
-}
-
-// Reusable select field
-interface SelectFieldProps {
-    label: string;
-    options: Record<string, string>;
-    required?: boolean;
-    error?: string;
-    register: any;
-    name: string;
-}
-
-function SelectField({ label, options, required, error, register, name }: SelectFieldProps) {
-    return (
-        <FormField label={label} required={required} error={error}>
-            <select className="w-full border px-3 py-2 rounded-md" {...register(name)}>
-                {Object.entries(options).map(([value, label]) => (
-                    <option key={value} value={value}>
-                        {label}
-                    </option>
-                ))}
-            </select>
-        </FormField>
-    );
-}
 
 export default function NewItemPage() {
     const router = useRouter();
