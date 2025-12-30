@@ -45,3 +45,17 @@ export const UnitOfMeasureLabel: Record<UnitOfMeasure, string> = {
     [UnitOfMeasure.SET]: "Set",
     [UnitOfMeasure.SHEET]: "Sheet",
 };
+
+export enum SortValues {
+    NAME = "name",
+    SKU = "sku",
+    CATEGORY = "category",
+    QUANTITY = "quantity",
+}
+
+export const SortValuesLabel: Record<SortValues, string> = {
+    [SortValues.NAME]: "Name",
+    [SortValues.SKU]: "SKU",
+    [SortValues.CATEGORY]: "Category",
+    [SortValues.QUANTITY]: "Quantity",
+};

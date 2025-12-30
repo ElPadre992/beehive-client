@@ -2,35 +2,20 @@
 
 import { Pagination, SearchField } from "@/components/ui-components";
 import { InventoryAPI, useDeleteInventoryItem } from "@/lib/api/inventory/items";
-import { InventoryCategory, InventoryCategoryLabel, UnitOfMeasureLabel } from "@/lib/enums/inventory/items";
+import { InventoryCategory, InventoryCategoryLabel, SortValues, SortValuesLabel, UnitOfMeasureLabel } from "@/lib/enums/inventory/items";
+import { useLocalStorageState } from "@/lib/helpers/common";
 import { InventoryItem } from "@/lib/schemas/inventory/inventory-item.schema";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 
-
-function useLocalStorageState<T>(key: string, defaultValue: T) {
-    const [state, setState] = useState<T>(() => {
-        if (typeof window !== "undefined") {
-            const stored = localStorage.getItem(key);
-            return stored ? JSON.parse(stored) : defaultValue;
-        }
-        return defaultValue;
-    });
-
-    useEffect(() => {
-        localStorage.setItem(key, JSON.stringify(state));
-    }, [key, state]);
-
-    return [state, setState] as const;
-}
 
 function InventoryTable({ items, onDelete }: { items: InventoryItem[], onDelete: (id: number) => void }) {
     const GRID_COLS = "grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr]";
     return (
         <>
             {items.map((item) => (
-                <div key={item.id} className={`grid ${GRID_COLS} gap-4 px-4 py-3 border-b items-center`}>
+                <div key={item.id} className={`grid ${GRID_COLS} gap-4 px-3 py-2 border-b items-center`}>
                     <div>{item.name}</div>
                     <div>{item.sku}</div>
                     <div>{InventoryCategoryLabel[item.category]}</div>
@@ -74,12 +59,12 @@ export default function InventoryItems() {
         }
     }, []);
 
-    const deleteMutation = useDeleteInventoryItem();
-
     const handlePageSizeChange = (newSize: number) => {
         setPageSize(newSize);
         localStorage.setItem("inventoryPageSize", newSize.toString());
     };
+
+    const deleteMutation = useDeleteInventoryItem();
 
     const { data, isLoading, error } = useQuery({
         queryKey: ["inventory/items", page, pageSize, filters],
@@ -116,7 +101,7 @@ export default function InventoryItems() {
                         <select
                             value={filters.category ?? ""}
                             onChange={(e) => handleFilterChange("category", e.target.value)}
-                            className="border rounded-md px-2 py-1.5 text-sm"
+                            className="border rounded-md px-3 py-2 text-sm"
                         >
                             <option value="all">All Categories</option>
                             {Object.values(InventoryCategory).map((category) => (
@@ -133,12 +118,13 @@ export default function InventoryItems() {
                             <select
                                 value={filters.sortBy}
                                 onChange={(e) => handleFilterChange("sortBy", e.target.value)}
-                                className="border rounded-md px-2 py-1 text-sm"
+                                className="border rounded-md px-3 py-2 text-sm"
                             >
-                                <option value="name">Name</option>
-                                <option value="sku">SKU</option>
-                                <option value="category">Category</option>
-                                <option value="quantity">Quantity</option>
+                                {Object.values(SortValues).map((value) => (
+                                    <option key={value} value={value}>
+                                        {SortValuesLabel[value]}
+                                    </option>
+                                ))}
                             </select>
 
                             <button
@@ -149,7 +135,7 @@ export default function InventoryItems() {
                                         filters.sortOrder === "asc" ? "desc" : "asc"
                                     )
                                 }
-                                className="border rounded-md px-2 py-1 text-sm w-18 text-left"
+                                className="border rounded-md px-3 py-2 text-sm w-18 text-left"
                             >
                                 {filters.sortOrder === "asc" ? "↑ Asc" : "↓ Desc"}
                             </button>
@@ -158,7 +144,7 @@ export default function InventoryItems() {
 
                     {/* New Item */}
                     <Link href="/inventory/items/new">
-                        <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md shadow">
+                        <button className="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md shadow">
                             New Item
                         </button>
                     </Link>
@@ -169,7 +155,7 @@ export default function InventoryItems() {
             <div className="w-full border rounded-md overflow-hidden text-sm">
                 {/* Header */}
                 <div
-                    className={`hidden md:grid ${GRID_COLS} gap-4 px-4 py-2 border-b font-semibold bg-muted-foreground text-white`}
+                    className={`hidden md:grid ${GRID_COLS} gap-4 px-3 py-2 border-b font-semibold bg-muted-foreground text-white`}
                 >
                     <div>Name</div>
                     <div>SKU</div>
@@ -182,9 +168,9 @@ export default function InventoryItems() {
                 {/* Rows */}
                 <div>
                     {isLoading ? (
-                        <p className="px-4 py-3 text-sm text-gray-500">Loading items…</p>
+                        <p className="px-3 py-2 text-sm text-gray-500">Loading items…</p>
                     ) : data?.data.length === 0 ? (
-                        <p className="px-4 py-3 text-sm text-gray-500">
+                        <p className="px-3 py-2 text-sm text-gray-500">
                             No items match your filters.
                         </p>
                     ) : (

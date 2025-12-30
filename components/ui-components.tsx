@@ -118,7 +118,7 @@ export function SearchField({
                 placeholder="Search…"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                className="border rounded-md px-3 py-1.5 pr-8 text-sm w-full"
+                className="border rounded-md px-3 py-2 text-sm w-full"
             />
 
             {/* Keyboard hint */}
