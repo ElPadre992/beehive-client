@@ -1,4 +1,34 @@
+import { newButtonStyle, paginationButtonStyle, subheaderStyle, w18ButtonStyle } from "@/lib/helpers/style";
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+
+export function SubheaderField({ label }: { label: string }) {
+    return (
+        <>
+            <h2 className={subheaderStyle}>{label}</h2>
+            <hr className="mt-2 mb-4" />
+        </>
+    )
+}
+
+// **********************************
+// NEW BUTTON
+// **********************************
+
+interface NewButtonProps {
+    url: string;
+    label: string;
+}
+
+export function NewButton({ url, label }: NewButtonProps) {
+    return (
+        <Link href={url}>
+            <button className={newButtonStyle}>
+                {label}
+            </button>
+        </Link>
+    );
+}
 
 // **********************************
 // FORM FIELD
@@ -18,8 +48,8 @@ export function FormField({ label, required, error, children }: FormFieldProps) 
                 <label className="w-35 font-medium mt-2">
                     {label} {required && <span className="text-red-500">*</span>}
                 </label>
-                <div className="flex-1">{children}</div>
 
+                <div className="flex-1">{children}</div>
             </div>
             {error && <p className="text-red-600 mt-2">{error}</p>}
         </div>
@@ -226,17 +256,12 @@ export const Pagination: React.FC<PaginationProps> = ({
     const pageNumbers = getPageNumbers();
 
     return (
-        <div className="flex justify-between items-center px-4 py-3 text-sm flex-wrap gap-2">
-            {/* Page info */}
-            <span className="mt-2">
-                Page {page} of {totalPages}
-            </span>
-
+        <div className="flex justify-between items-center py-6 text-sm">
             {/* Page size selector */}
             <div>
                 <label className="mr-2">Items per page:</label>
                 <select
-                    className="w-24 border px-3 py-2 rounded-md"
+                    className={w18ButtonStyle}
                     value={pageSize}
                     onChange={(e) => {
                         onPageSizeChange(Number(e.target.value));
@@ -253,7 +278,7 @@ export const Pagination: React.FC<PaginationProps> = ({
             </div>
 
             {/* Page buttons */}
-            <div className="flex gap-2 mt-2 flex-wrap">
+            <div className="flex gap-2">
 
                 {/* TODO: Hide after the first time shortcuts are used */}
                 <div className="text-xs text-muted-foreground mt-2">
@@ -264,7 +289,7 @@ export const Pagination: React.FC<PaginationProps> = ({
                     <button
                         disabled={page === 1 || isLoading}
                         onClick={() => onPageChange(1)}
-                        className="border rounded px-3 py-1 disabled:opacity-50"
+                        className={paginationButtonStyle}
                     >
                         {"<<"}
                     </button>
@@ -272,7 +297,7 @@ export const Pagination: React.FC<PaginationProps> = ({
                     <button
                         disabled={page === 1 || isLoading}
                         onClick={() => onPageChange(page - 1)}
-                        className="border rounded px-3 py-1 disabled:opacity-50"
+                        className={paginationButtonStyle}
                     >
                         {"<"}
                     </button>
@@ -297,7 +322,7 @@ export const Pagination: React.FC<PaginationProps> = ({
                     <button
                         disabled={page === totalPages || isLoading}
                         onClick={() => onPageChange(page + 1)}
-                        className="border rounded px-3 py-1 disabled:opacity-50"
+                        className={paginationButtonStyle}
                     >
                         {">"}
                     </button>
@@ -305,7 +330,7 @@ export const Pagination: React.FC<PaginationProps> = ({
                     <button
                         disabled={page === totalPages || isLoading}
                         onClick={() => onPageChange(totalPages)}
-                        className="border rounded px-3 py-1 disabled:opacity-50"
+                        className={paginationButtonStyle}
                     >
                         {">>"}
                     </button>

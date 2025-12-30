@@ -1,9 +1,10 @@
 "use client";
 
 import DrawerShell from "@/components/drawer-shell";
-import { FormField, SelectField } from "@/components/ui-components";
+import { FormField, SelectField, SubheaderField } from "@/components/ui-components";
 import { useCreateInventoryItem } from "@/lib/api/inventory/items";
 import { InventoryCategoryLabel, UnitOfMeasureLabel } from "@/lib/enums/inventory/items";
+import { fullWidthInputStyle } from "@/lib/helpers/style";
 import { InventoryItemFormValues, inventoryItemSchema } from "@/lib/schemas/inventory/inventory-item.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
@@ -11,7 +12,6 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 export default function NewItemPage() {
-    const router = useRouter();
     const [formError, setFormError] = useState<string | null>(null);
 
     const form = useForm<InventoryItemFormValues>({
@@ -21,6 +21,8 @@ export default function NewItemPage() {
 
     const { register, handleSubmit, formState, reset } = form;
     const { errors, isSubmitting } = formState;
+
+    const router = useRouter();
 
     const createMutation = useCreateInventoryItem();
 
@@ -68,13 +70,12 @@ export default function NewItemPage() {
             <form onSubmit={handleSubmit(onSubmit)}>
                 {/* Basic Information */}
                 <div>
-                    <h2 className="text-lg font-semibold">Basic Information</h2>
-                    <hr className="mt-2 mb-4" />
+                    <SubheaderField label="Basic Information" />
 
                     <FormField label="SKU" required error={errors.sku?.message}>
                         <input
                             type="text"
-                            className="w-full border px-3 py-2 rounded-md uppercase"
+                            className={fullWidthInputStyle}
                             placeholder="Internal item code (e.g. AISI304-10MM)"
                             {...register("sku")}
                         />
@@ -90,7 +91,7 @@ export default function NewItemPage() {
 
                     <FormField label="Name" required error={errors.name?.message}>
                         <input
-                            className="w-full border px-3 py-2 rounded-md"
+                            className={fullWidthInputStyle}
                             placeholder="Stainless Steel Plate 10mm"
                             {...register("name")}
                         />
@@ -98,8 +99,8 @@ export default function NewItemPage() {
 
                     <FormField label="Description">
                         <textarea
-                            className="w-full border px-3 py-2 rounded-md"
                             rows={3}
+                            className={fullWidthInputStyle}
                             placeholder="Optional notes, specifications, or usage details"
                             {...register("description")}
                         />
@@ -110,8 +111,7 @@ export default function NewItemPage() {
 
                 {/* Stock & Unit */}
                 <div>
-                    <h2 className="text-lg font-semibold">Stock & Unit</h2>
-                    <hr className="mt-2 mb-4" />
+                    <SubheaderField label="Stock & Unit" />
 
                     <SelectField
                         label="Unit"
@@ -125,7 +125,7 @@ export default function NewItemPage() {
                         <input
                             type="number"
                             step="any"
-                            className="w-full border px-3 py-2 rounded-md"
+                            className={fullWidthInputStyle}
                             {...register("minQuantity", { valueAsNumber: true })}
                         />
                     </FormField>
@@ -134,7 +134,7 @@ export default function NewItemPage() {
                         <input
                             type="number"
                             step="any"
-                            className="w-full border px-3 py-2 rounded-md"
+                            className={fullWidthInputStyle}
                             {...register("maxQuantity", { valueAsNumber: true })}
                         />
                     </FormField>
