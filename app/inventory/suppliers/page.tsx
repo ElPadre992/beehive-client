@@ -1,16 +1,16 @@
 "use client";
 
 import { NewButton, Pagination, SearchField } from "@/components/ui-components";
-import { InventoryAPI, useDeleteInventoryItem } from "@/lib/api/inventory/items";
-import { InventoryCategory, InventoryCategoryLabel, SortValues, SortValuesLabel, UnitOfMeasureLabel } from "@/lib/enums/inventory/items";
+import { SupplierAPI, useDeleteInventorySupplier } from "@/lib/api/inventory/suppliers";
+import { SortValues, SortValuesLabel } from "@/lib/enums/inventory/suppliers";
 import { useLocalStorageState } from "@/lib/helpers/common";
 import { infoParagraphStyle, inputStyle, tableHeaderStyle, tableRowStyle, tableStyle, w18ButtonStyle } from "@/lib/helpers/style";
-import { InventoryItem } from "@/lib/schemas/inventory/inventory-item.schema";
+import { InventorySupplier } from "@/lib/schemas/inventory/inventory-supplier.schema";
 import { useQuery } from "@tanstack/react-query";
 import { useCallback, useState } from "react";
 
 interface InventoryTableProps {
-    items: InventoryItem[];
+    items: InventorySupplier[];
     isLoading: boolean;
     onDelete: (id: number) => void;
     columnStyle: string
@@ -23,16 +23,17 @@ function InventoryTable({ items, isLoading, onDelete, columnStyle }: InventoryTa
                 <p className={infoParagraphStyle}>Loading items…</p>
             ) : items.length === 0 ? (
                 <p className={infoParagraphStyle}>
-                    No items match your filters.
+                    No suppliers match your filters.
                 </p>
             ) : (
                 items.map((item) => (
                     <div key={item.id} className={`${columnStyle} ${tableRowStyle}`}>
                         <div>{item.name}</div>
-                        <div>{item.sku}</div>
-                        <div>{InventoryCategoryLabel[item.category]}</div>
-                        <div>{item.quantity}</div>
-                        <div>{UnitOfMeasureLabel[item.unit]}</div>
+                        <div>{item.contact}</div>
+                        <div>{item.email}</div>
+                        <div>{item.phone}</div>
+                        <div>{item.address}</div>
+                        <div>{item.notes}</div>
                         <button
                             onClick={() => onDelete(item.id)}
                             className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded-md"
@@ -46,17 +47,16 @@ function InventoryTable({ items, isLoading, onDelete, columnStyle }: InventoryTa
     );
 }
 
-export default function InventoryItems() {
+export default function InventorySuppliers() {
     const [page, setPage] = useLocalStorageState("inventoryPage", 1);
     const [pageSize, setPageSize] = useLocalStorageState("inventoryPageSize", 20);
 
-    const GridColumns = "grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr]";
+    const GridColumns = "grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_1fr]";
 
     const [filters, setFilters] = useState({
         search: "",
         sortBy: "name",
         sortOrder: "asc" as "asc" | "desc",
-        category: "all",
     });
 
     const handleFilterChange = useCallback(<K extends keyof typeof filters>(
@@ -67,42 +67,40 @@ export default function InventoryItems() {
 
         // Switch to the first page if a user is applying filters
         if (
-            (key === "search" && value.trim() !== "") ||
-            (key === "category" && value.trim() !== "all")
+            (key === "search" && value.trim() !== "")
         ) {
             setPage(1);
         }
     }, []);
+
+    const { data, isLoading, error } = useQuery({
+        queryKey: ["/inventory/suppliers", page, pageSize, filters],
+        queryFn: () =>
+            SupplierAPI.list({
+                page,
+                pageSize,
+                search: filters.search,
+                sortBy: filters.sortBy,
+                sortOrder: filters.sortOrder,
+            }),
+        placeholderData: (previousData) => previousData
+    });
+
+    const deleteMutation = useDeleteInventorySupplier();
 
     const handlePageSizeChange = (newSize: number) => {
         setPageSize(newSize);
         localStorage.setItem("inventoryPageSize", newSize.toString());
     };
 
-    const deleteMutation = useDeleteInventoryItem();
-
-    const { data, isLoading, error } = useQuery({
-        queryKey: ["/inventory/items", page, pageSize, filters],
-        queryFn: () =>
-            InventoryAPI.list({
-                page,
-                pageSize,
-                search: filters.search,
-                sortBy: filters.sortBy,
-                sortOrder: filters.sortOrder,
-                ...(filters.category !== "all" ? { category: filters.category } : {}),
-            }),
-        placeholderData: (previousData) => previousData
-    });
-
-    if (isLoading) { return <p>Loading inventory items...</p>; }
+    if (isLoading) { return <p>Loading inventory suppliers...</p>; }
     if (error) { return <p className="text-red-600">Error: {(error as Error).message}</p>; }
 
     return (
         <div className="w-full mx-auto">
             {/* Header / Controls */}
             <div className="flex justify-between items-center pb-6">
-                <h1 className="text-3xl font-bold">Items</h1>
+                <h1 className="text-3xl font-bold">Suppliers</h1>
 
                 {/* Search / Filter / Sort */}
                 <div className="flex items-center gap-2">
@@ -111,7 +109,7 @@ export default function InventoryItems() {
                     <SearchField onSearch={(value) => handleFilterChange("search", value)} />
 
                     {/* Category */}
-                    <select
+                    {/* <select
                         value={filters.category ?? ""}
                         onChange={(e) => handleFilterChange("category", e.target.value)}
                         className={inputStyle}
@@ -122,7 +120,7 @@ export default function InventoryItems() {
                                 {InventoryCategoryLabel[category]}
                             </option>
                         ))}
-                    </select>
+                    </select> */}
 
                     {/* Sort */}
                     <label className="text-sm font-medium">Sort</label>
@@ -155,7 +153,7 @@ export default function InventoryItems() {
                 </div>
 
                 {/* New Item */}
-                <NewButton url="/inventory/items/new" label="New Item" />
+                <NewButton url="/inventory/suppliers/new" label="New Supplier" />
             </div>
 
             {/* Table */}
@@ -163,10 +161,11 @@ export default function InventoryItems() {
                 {/* Table Header */}
                 <div className={`${tableHeaderStyle} ${GridColumns}`}>
                     <div>Name</div>
-                    <div>SKU</div>
-                    <div>Category</div>
-                    <div>Quantity</div>
-                    <div>Unit</div>
+                    <div>Contact</div>
+                    <div>Email</div>
+                    <div>Phone</div>
+                    <div>Address</div>
+                    <div>Notes</div>
                     <div>Actions</div>
                 </div>
 
@@ -191,5 +190,9 @@ export default function InventoryItems() {
                 onPageSizeChange={handlePageSizeChange}
             />
         </div>
-    );
+    )
+}
+
+function useDeleteSupplier() {
+    throw new Error("Function not implemented.");
 }

@@ -1,7 +1,6 @@
-import { apiFetch } from "@/lib/api";
-import { InventoryItem, InventoryItemFormValues, inventoryItemSchema } from "@/lib/schemas/inventory/inventory-item.schema";
+import { InventorySupplier, InventorySupplierFormValues, inventorySupplierSchema } from "@/lib/schemas/inventory/inventory-supplier.schema";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-
+import { apiFetch } from "../../api";
 
 export interface ListInventoryParams {
     page?: number;
@@ -9,7 +8,6 @@ export interface ListInventoryParams {
     search?: string;
     sortBy?: string;
     sortOrder?: "asc" | "desc";
-    category?: string;
 }
 
 export interface PaginatedResult<T> {
@@ -19,60 +17,57 @@ export interface PaginatedResult<T> {
     pageSize: number;
 }
 
-
-// ----------------------------------
-// API Functions
-// ----------------------------------
-export const InventoryAPI = {
+export const SupplierAPI = {
     list: (params: ListInventoryParams) =>
-        apiFetch<PaginatedResult<InventoryItem>>(
-            `/inventory/items?${new URLSearchParams(params as any)}`
+        apiFetch<PaginatedResult<InventorySupplier>>(
+            `/inventory/suppliers?${new URLSearchParams(params as any)}`
         ),
 
-    create: async (item: InventoryItemFormValues) => {
+
+    create: (supplier: InventorySupplierFormValues) => {
         // Optional extra validation on API side
-        const parsed = inventoryItemSchema.safeParse(item)
+        const parsed = inventorySupplierSchema.safeParse(supplier)
         if (!parsed.success) {
             throw new Error(parsed.error.issues.map(issue => issue.message).join(", "))
         }
 
-        return apiFetch<InventoryItem>("/inventory/items", {
+        return apiFetch<InventorySupplier>("/inventory/suppliers", {
             method: "POST",
             body: JSON.stringify(parsed.data),
         })
     },
 
     delete: (id: number) =>
-        apiFetch<InventoryItem>(`/inventory/items/${id}`, {
+        apiFetch<InventorySupplier>(`/inventory/suppliers/${id}`, {
             method: "DELETE",
         }),
-}
+};
 
 // ----------------------------------
 // React Query Hooks
 // ----------------------------------
-export const useCreateInventoryItem = () => {
+export const useCreateInventorySupplier = () => {
     const queryClient = useQueryClient()
 
-    return useMutation<InventoryItem, Error, InventoryItemFormValues>({
-        mutationFn: InventoryAPI.create,
+    return useMutation<InventorySupplier, Error, InventorySupplierFormValues>({
+        mutationFn: SupplierAPI.create,
         onSuccess: () => {
             queryClient.invalidateQueries({
-                queryKey: ["/inventory/items"],
+                queryKey: ["/inventory/suppliers"],
             });
         },
-        onError: (error) => console.error("Failed to create item:", error.message),
+        onError: (error) => console.error("Failed to create a supplier:", error.message),
     })
 }
 
-export const useDeleteInventoryItem = () => {
+export const useDeleteInventorySupplier = () => {
     const queryClient = useQueryClient()
 
-    return useMutation<InventoryItem, Error, number>({
-        mutationFn: InventoryAPI.delete,
+    return useMutation<InventorySupplier, Error, number>({
+        mutationFn: SupplierAPI.delete,
         onSuccess: () => {
             queryClient.invalidateQueries({
-                queryKey: ["inventory/items"],
+                queryKey: ["/inventory/suppliers"],
             });
         },
         onError: (error) => console.error("Failed to delete item:", error.message),
