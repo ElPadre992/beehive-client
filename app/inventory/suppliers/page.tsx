@@ -5,7 +5,7 @@ import { SupplierAPI, useDeleteInventorySupplier } from "@/lib/api/inventory/sup
 import { SortValues, SortValuesLabel } from "@/lib/enums/inventory/suppliers";
 import { useLocalStorageState } from "@/lib/helpers/common";
 import { infoParagraphStyle, inputStyle, tableHeaderStyle, tableRowStyle, tableStyle, w18ButtonStyle } from "@/lib/helpers/style";
-import { InventorySupplier } from "@/lib/schemas/inventory/inventory-supplier.schema";
+import { InventorySupplier } from "@/lib/schemas/inventory/supplier.schema";
 import { useQuery } from "@tanstack/react-query";
 import { useCallback, useState } from "react";
 
@@ -29,11 +29,11 @@ function InventoryTable({ items, isLoading, onDelete, columnStyle }: InventoryTa
                 items.map((item) => (
                     <div key={item.id} className={`${columnStyle} ${tableRowStyle}`}>
                         <div>{item.name}</div>
-                        <div>{item.contact}</div>
-                        <div>{item.email}</div>
-                        <div>{item.phone}</div>
                         <div>{item.address}</div>
                         <div>{item.notes}</div>
+                        <div>{item.contacts ? (item.contacts[0]?.name) : ""}</div>
+                        <div>{item.contacts ? (item.contacts[0]?.email) : ""}</div>
+                        <div>{item.contacts ? (item.contacts[0]?.phone) : ""}</div>
                         <button
                             onClick={() => onDelete(item.id)}
                             className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded-md"
@@ -161,11 +161,11 @@ export default function InventorySuppliers() {
                 {/* Table Header */}
                 <div className={`${tableHeaderStyle} ${GridColumns}`}>
                     <div>Name</div>
+                    <div>Address</div>
+                    <div>Notes</div>
                     <div>Contact</div>
                     <div>Email</div>
                     <div>Phone</div>
-                    <div>Address</div>
-                    <div>Notes</div>
                     <div>Actions</div>
                 </div>
 

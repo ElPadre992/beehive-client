@@ -4,27 +4,38 @@ import DrawerShell from "@/components/drawer-shell";
 import { FormField, SubheaderField } from "@/components/ui-components";
 import { useCreateInventorySupplier } from "@/lib/api/inventory/suppliers";
 import { fullWidthInputStyle } from "@/lib/helpers/style";
-import { InventorySupplierFormValues, inventorySupplierSchema } from "@/lib/schemas/inventory/inventory-supplier.schema";
+import { SupplierFormValues, inventorySupplierSchema } from "@/lib/schemas/inventory/supplier.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useFieldArray, useForm } from "react-hook-form";
+import { SupplierContacts } from "../../component/supplier-contact";
 
 export default function NewSupplierPage() {
     const [formError, setFormError] = useState<string | null>(null);
 
-    const form = useForm<InventorySupplierFormValues>({
+    const form = useForm<SupplierFormValues>({
         resolver: zodResolver(inventorySupplierSchema),
+        defaultValues: {
+            name: "",
+            address: "",
+            notes: "",
+            contacts: []
+        }
     });
 
-    const { register, handleSubmit, formState, reset } = form;
+    const { register, control, handleSubmit, formState, reset } = form;
     const { errors, isSubmitting } = formState;
+    const { fields, append, remove } = useFieldArray({
+        control,
+        name: "contacts"
+    });
 
     const router = useRouter();
 
     const createMutation = useCreateInventorySupplier();
 
-    const onSubmit = (data: InventorySupplierFormValues) => {
+    const onSubmit = (data: SupplierFormValues) => {
         setFormError(null);
         createMutation.mutate(data, {
             onError: (error: any) => setFormError(error?.message || "Something went wrong"),
@@ -78,7 +89,7 @@ export default function NewSupplierPage() {
                         />
                     </FormField>
 
-                    <FormField label="Contact" required error={errors.contact?.message}>
+                    {/* <FormField label="Contact" required error={errors.contact?.message}>
                         <input
                             className={fullWidthInputStyle}
                             placeholder="Contact"
@@ -102,7 +113,7 @@ export default function NewSupplierPage() {
                             placeholder="Phone number"
                             {...register("phone")}
                         />
-                    </FormField>
+                    </FormField> */}
 
                     <FormField label="Address" error={errors.address?.message}>
                         <input
@@ -120,6 +131,17 @@ export default function NewSupplierPage() {
                             {...register("notes")}
                         />
                     </FormField>
+                </div>
+
+                <div>
+                    {/* Contacts */}
+                    <SupplierContacts
+                        fields={fields}
+                        register={register}
+                        remove={remove}
+                        append={append}
+                        errors={errors}
+                    />
                 </div>
 
                 <div className="mt-6" />

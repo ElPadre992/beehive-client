@@ -1,6 +1,6 @@
-import { InventorySupplier, InventorySupplierFormValues, inventorySupplierSchema } from "@/lib/schemas/inventory/inventory-supplier.schema";
+import { apiFetch } from "@/lib/api";
+import { InventorySupplier, SupplierFormValues, inventorySupplierSchema } from "@/lib/schemas/inventory/supplier.schema";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiFetch } from "../../api";
 
 export interface ListInventoryParams {
     page?: number;
@@ -24,7 +24,7 @@ export const SupplierAPI = {
         ),
 
 
-    create: (supplier: InventorySupplierFormValues) => {
+    create: (supplier: SupplierFormValues) => {
         // Optional extra validation on API side
         const parsed = inventorySupplierSchema.safeParse(supplier)
         if (!parsed.success) {
@@ -49,7 +49,7 @@ export const SupplierAPI = {
 export const useCreateInventorySupplier = () => {
     const queryClient = useQueryClient()
 
-    return useMutation<InventorySupplier, Error, InventorySupplierFormValues>({
+    return useMutation<InventorySupplier, Error, SupplierFormValues>({
         mutationFn: SupplierAPI.create,
         onSuccess: () => {
             queryClient.invalidateQueries({
