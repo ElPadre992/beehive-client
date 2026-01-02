@@ -1,10 +1,11 @@
 "use client"
 
-import DrawerShell from "@/components/drawer-shell";
-import { FormField, SubheaderField } from "@/components/ui-components";
-import { useCreateSupplier } from "@/lib/api/inventory/suppliers";
-import { fullWidthInputStyle } from "@/lib/helpers/style";
-import { SupplierFormValues, SupplierSchema } from "@/lib/schemas/inventory/supplier.schema";
+import DrawerShell from "@/components/ui/drawer-shell";
+import { FormField } from "@/components/ui/form/form-field";
+import { SubheaderField } from "@/components/ui/text/text-fields";
+import { useCreateSupplier } from "@/features/inventory/suppliers/supplier.api";
+import { SupplierFormValues, SupplierSchema } from "@/features/inventory/suppliers/supplier.schema";
+import { fullWidthInputClass } from "@/styles/shared.classes";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -83,7 +84,7 @@ export default function NewSupplierPage() {
 
                     <FormField label="Name" required error={errors.name?.message}>
                         <input
-                            className={fullWidthInputStyle}
+                            className={fullWidthInputClass}
                             placeholder="Company name"
                             {...register("name")}
                         />
@@ -117,7 +118,7 @@ export default function NewSupplierPage() {
 
                     <FormField label="Address" error={errors.address?.message}>
                         <input
-                            className={fullWidthInputStyle}
+                            className={fullWidthInputClass}
                             placeholder="Address"
                             {...register("address")}
                         />
@@ -126,7 +127,7 @@ export default function NewSupplierPage() {
                     <FormField label="Notes">
                         <textarea
                             rows={3}
-                            className={fullWidthInputStyle}
+                            className={fullWidthInputClass}
                             placeholder="Optional notes ..."
                             {...register("notes")}
                         />

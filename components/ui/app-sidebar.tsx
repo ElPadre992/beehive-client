@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/sidebar";
 
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { useSidebarShortcuts } from "@/hooks/use-sidebar-shortcuts";
+import { useSidebarShortcuts } from "@/hooks/ui/use-sidebar-shortcuts";
 import { cn } from "@/lib/utils";
 
 import {
@@ -144,8 +144,6 @@ function MenuButton({ item, pathname, open }: MenuButtonTooltipProps) {
 
     return content;
 }
-
-
 
 // --------------------
 // Main Sidebar

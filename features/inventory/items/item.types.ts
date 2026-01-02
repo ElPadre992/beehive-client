@@ -59,3 +59,10 @@ export const SortValuesLabel: Record<SortValues, string> = {
     [SortValues.CATEGORY]: "Category",
     [SortValues.QUANTITY]: "Quantity",
 };
+
+export interface InventoryFilters {
+    search: string;
+    category: InventoryCategory | "all";
+    sortBy: SortValues;
+    sortOrder: "asc" | "desc";
+}

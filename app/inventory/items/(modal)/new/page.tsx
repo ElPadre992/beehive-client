@@ -1,11 +1,13 @@
 "use client";
 
-import DrawerShell from "@/components/drawer-shell";
-import { FormField, SelectField, SubheaderField } from "@/components/ui-components";
-import { useCreateInventoryItem } from "@/lib/api/inventory/items";
-import { InventoryCategoryLabel, UnitOfMeasureLabel } from "@/lib/enums/inventory/items";
-import { fullWidthInputStyle } from "@/lib/helpers/style";
-import { InventoryItemFormValues, inventoryItemSchema } from "@/lib/schemas/inventory/inventory-item.schema";
+import DrawerShell from "@/components/ui/drawer-shell";
+import { FormField } from "@/components/ui/form/form-field";
+import { SelectField } from "@/components/ui/form/select-field";
+import { SubheaderField } from "@/components/ui/text/text-fields";
+import { useCreateInventoryItem } from "@/features/inventory/items/item.api";
+import { InventoryItemFormValues, inventoryItemSchema } from "@/features/inventory/items/item.schema";
+import { InventoryCategoryLabel, UnitOfMeasureLabel } from "@/features/inventory/items/item.types";
+import { fullWidthInputClass } from "@/styles/shared.classes";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -75,7 +77,7 @@ export default function NewItemPage() {
                     <FormField label="SKU" required error={errors.sku?.message}>
                         <input
                             type="text"
-                            className={fullWidthInputStyle}
+                            className={fullWidthInputClass}
                             placeholder="Internal item code (e.g. AISI304-10MM)"
                             {...register("sku")}
                         />
@@ -91,7 +93,7 @@ export default function NewItemPage() {
 
                     <FormField label="Name" required error={errors.name?.message}>
                         <input
-                            className={fullWidthInputStyle}
+                            className={fullWidthInputClass}
                             placeholder="Stainless Steel Plate 10mm"
                             {...register("name")}
                         />
@@ -100,7 +102,7 @@ export default function NewItemPage() {
                     <FormField label="Description">
                         <textarea
                             rows={3}
-                            className={fullWidthInputStyle}
+                            className={fullWidthInputClass}
                             placeholder="Optional notes, specifications, or usage details"
                             {...register("description")}
                         />
@@ -125,7 +127,7 @@ export default function NewItemPage() {
                         <input
                             type="number"
                             step="any"
-                            className={fullWidthInputStyle}
+                            className={fullWidthInputClass}
                             {...register("minQuantity", { valueAsNumber: true })}
                         />
                     </FormField>
@@ -134,7 +136,7 @@ export default function NewItemPage() {
                         <input
                             type="number"
                             step="any"
-                            className={fullWidthInputStyle}
+                            className={fullWidthInputClass}
                             {...register("maxQuantity", { valueAsNumber: true })}
                         />
                     </FormField>

@@ -1,11 +1,14 @@
 "use client";
 
-import { NewButton, Pagination, SearchField } from "@/components/ui-components";
-import { SupplierAPI, useDeleteSupplier } from "@/lib/api/inventory/suppliers";
-import { SortValues, SortValuesLabel } from "@/lib/enums/inventory/suppliers";
-import { useLocalStorageState } from "@/lib/helpers/common";
-import { infoParagraphStyle, inputStyle, tableHeaderStyle, tableRowStyle, tableStyle, w18ButtonStyle } from "@/lib/helpers/style";
-import { Supplier } from "@/lib/schemas/inventory/supplier.schema";
+import { PrimaryButton } from "@/components/ui/buttons/primary-button";
+import { SearchField } from "@/components/ui/form/search-field";
+import { Pagination } from "@/components/ui/pagination";
+import { HeaderField } from "@/components/ui/text/text-fields";
+import { SupplierAPI, useDeleteSupplier } from "@/features/inventory/suppliers/supplier.api";
+import { Supplier } from "@/features/inventory/suppliers/supplier.schema";
+import { SortValues, SortValuesLabel } from "@/features/inventory/suppliers/supplier.types";
+import { useLocalStorageState } from "@/hooks/storage/use-local-storage-state";
+import { compactButtonClass, infoParagraphClass, inputClass, tableClass, tableHeaderClass, tableRowClass } from "@/styles/shared.classes";
 import { useQuery } from "@tanstack/react-query";
 import { useCallback, useState } from "react";
 
@@ -20,14 +23,14 @@ function InventoryTable({ items, isLoading, onDelete, columnStyle }: InventoryTa
     return (
         <>
             {isLoading ? (
-                <p className={infoParagraphStyle}>Loading suppliers…</p>
+                <p className={infoParagraphClass}>Loading suppliers…</p>
             ) : items.length === 0 ? (
-                <p className={infoParagraphStyle}>
+                <p className={infoParagraphClass}>
                     No suppliers match your filters.
                 </p>
             ) : (
                 items.map((item) => (
-                    <div key={item.id} className={`${columnStyle} ${tableRowStyle}`}>
+                    <div key={item.id} className={`${columnStyle} ${tableRowClass}`}>
                         <div>{item.name}</div>
                         <div>{item.address}</div>
                         <div>{item.notes}</div>
@@ -51,8 +54,6 @@ export default function Suppliers() {
     const [page, setPage] = useLocalStorageState("inventoryPage", 1);
     const [pageSize, setPageSize] = useLocalStorageState("inventoryPageSize", 20);
 
-    const GridColumns = "grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_1fr]";
-
     const [filters, setFilters] = useState({
         search: "",
         sortBy: "name",
@@ -73,6 +74,13 @@ export default function Suppliers() {
         }
     }, []);
 
+    const handlePageSizeChange = (newSize: number) => {
+        setPageSize(newSize);
+        localStorage.setItem("inventoryPageSize", newSize.toString());
+    };
+
+    const GridColumns = "grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_1fr]";
+
     const { data, isLoading, error } = useQuery({
         queryKey: ["/inventory/suppliers", page, pageSize, filters],
         queryFn: () =>
@@ -88,19 +96,23 @@ export default function Suppliers() {
 
     const deleteMutation = useDeleteSupplier();
 
-    const handlePageSizeChange = (newSize: number) => {
-        setPageSize(newSize);
-        localStorage.setItem("inventoryPageSize", newSize.toString());
-    };
+
 
     if (isLoading) { return <p>Loading inventory suppliers...</p>; }
-    if (error) { return <p className="text-red-600">Error: {(error as Error).message}</p>; }
+
+    if (error) {
+        return (
+            <div className="border border-red-300 bg-red-50 text-red-700 px-3 py-2 rounded">
+                {error.message}
+            </div>
+        )
+    }
 
     return (
         <div className="w-full mx-auto">
             {/* Header / Controls */}
             <div className="flex justify-between items-center pb-6">
-                <h1 className="text-3xl font-bold">Suppliers</h1>
+                <HeaderField label="Suppliers" />
 
                 {/* Search / Filter / Sort */}
                 <div className="flex items-center gap-2">
@@ -128,7 +140,7 @@ export default function Suppliers() {
                     <select
                         value={filters.sortBy}
                         onChange={(e) => handleFilterChange("sortBy", e.target.value)}
-                        className={inputStyle}
+                        className={inputClass}
                     >
                         {Object.values(SortValues).map((value) => (
                             <option key={value} value={value}>
@@ -146,20 +158,20 @@ export default function Suppliers() {
                                 filters.sortOrder === "asc" ? "desc" : "asc"
                             )
                         }
-                        className={w18ButtonStyle}
+                        className={compactButtonClass}
                     >
                         {filters.sortOrder === "asc" ? "↑ Asc" : "↓ Desc"}
                     </button>
                 </div>
 
                 {/* New Item */}
-                <NewButton url="/inventory/suppliers/new" label="New Supplier" />
+                <PrimaryButton url="/inventory/suppliers/new" label="New Supplier" />
             </div>
 
             {/* Table */}
-            <div className={tableStyle}>
+            <div className={tableClass}>
                 {/* Table Header */}
-                <div className={`${tableHeaderStyle} ${GridColumns}`}>
+                <div className={`${tableHeaderClass} ${GridColumns}`}>
                     <div>Name</div>
                     <div>Address</div>
                     <div>Notes</div>

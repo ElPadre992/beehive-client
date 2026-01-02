@@ -1,7 +1,6 @@
-
-import { FormField } from "@/components/ui-components";
-import { fullWidthInputStyle } from "@/lib/helpers/style";
-import { SupplierFormValues } from "@/lib/schemas/inventory/supplier.schema";
+import { FormField } from "@/components/ui/form/form-field";
+import { SupplierFormValues } from "@/features/inventory/suppliers/supplier.schema";
+import { fullWidthInputClass } from "@/styles/shared.classes";
 import { FieldErrors, UseFieldArrayAppend, UseFormRegister } from "react-hook-form";
 
 type Props = {
@@ -47,7 +46,7 @@ export function SupplierContacts({
                     <div>
                         <FormField label="Contact" required error={errors.contacts?.[index]?.name?.message}>
                             <input
-                                className={fullWidthInputStyle}
+                                className={fullWidthInputClass}
                                 placeholder="Contact"
                                 {...register(
                                     `contacts.${index}.name`
@@ -58,7 +57,7 @@ export function SupplierContacts({
                         <FormField label="Email" required error={errors.contacts?.[index]?.email?.message}>
                             <input
                                 type="email"
-                                className={fullWidthInputStyle}
+                                className={fullWidthInputClass}
                                 placeholder="someone@email.com"
                                 {...register(
                                     `contacts.${index}.email`
@@ -69,7 +68,7 @@ export function SupplierContacts({
                         <FormField label="Phone" error={errors.contacts?.[index]?.phone?.message}>
                             <input
                                 type="number"
-                                className={fullWidthInputStyle}
+                                className={fullWidthInputClass}
                                 placeholder="Phone number"
                                 {...register(
                                     `contacts.${index}.phone`
@@ -80,7 +79,7 @@ export function SupplierContacts({
                         <FormField label="Notes">
                             <textarea
                                 rows={3}
-                                className={fullWidthInputStyle}
+                                className={fullWidthInputClass}
                                 placeholder="Optional notes ..."
                                 {...register(
                                     `contacts.${index}.notes`

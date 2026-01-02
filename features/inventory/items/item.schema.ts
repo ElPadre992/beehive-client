@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { InventoryCategory, UnitOfMeasure } from "../../enums/inventory/items";
+import { InventoryCategory, UnitOfMeasure } from "./item.types";
 
 export const inventoryItemSchema = z
     .object({

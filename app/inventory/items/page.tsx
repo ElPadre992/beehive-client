@@ -1,13 +1,15 @@
 "use client";
 
-import { NewButton, Pagination, SearchField } from "@/components/ui-components";
-import { InventoryAPI, useDeleteInventoryItem } from "@/lib/api/inventory/items";
-import { InventoryCategory, InventoryCategoryLabel, SortValues, SortValuesLabel, UnitOfMeasureLabel } from "@/lib/enums/inventory/items";
-import { useLocalStorageState } from "@/lib/helpers/common";
-import { infoParagraphStyle, inputStyle, tableHeaderStyle, tableRowStyle, tableStyle, w18ButtonStyle } from "@/lib/helpers/style";
-import { InventoryItem } from "@/lib/schemas/inventory/inventory-item.schema";
-import { useQuery } from "@tanstack/react-query";
-import { useCallback, useState } from "react";
+import { PrimaryButton } from "@/components/ui/buttons/primary-button";
+import { FilterBar } from "@/components/ui/fillter-bar";
+import { Pagination } from "@/components/ui/pagination";
+import { HeaderField } from "@/components/ui/text/text-fields";
+import { useInventoryList } from "@/features/inventory/items/hooks/use-inventory-list";
+import { useDeleteInventoryItem } from "@/features/inventory/items/item.api";
+import { inventoryFilterConfig } from "@/features/inventory/items/item.filters";
+import { InventoryItem } from "@/features/inventory/items/item.schema";
+import { InventoryCategoryLabel, UnitOfMeasureLabel } from "@/features/inventory/items/item.types";
+import { infoParagraphClass, tableClass, tableHeaderClass, tableRowClass } from "@/styles/shared.classes";
 
 interface InventoryTableProps {
     items: InventoryItem[];
@@ -20,14 +22,14 @@ function InventoryTable({ items, isLoading, onDelete, columnStyle }: InventoryTa
     return (
         <>
             {isLoading ? (
-                <p className={infoParagraphStyle}>Loading items…</p>
+                <p className={infoParagraphClass}>Loading items…</p>
             ) : items.length === 0 ? (
-                <p className={infoParagraphStyle}>
+                <p className={infoParagraphClass}>
                     No items match your filters.
                 </p>
             ) : (
                 items.map((item) => (
-                    <div key={item.id} className={`${columnStyle} ${tableRowStyle}`}>
+                    <div key={item.id} className={`${columnStyle} ${tableRowClass}`}>
                         <div>{item.name}</div>
                         <div>{item.sku}</div>
                         <div>{InventoryCategoryLabel[item.category]}</div>
@@ -47,121 +49,51 @@ function InventoryTable({ items, isLoading, onDelete, columnStyle }: InventoryTa
 }
 
 export default function InventoryItems() {
-    const [page, setPage] = useLocalStorageState("inventoryPage", 1);
-    const [pageSize, setPageSize] = useLocalStorageState("inventoryPageSize", 20);
+    const {
+        data,
+        isLoading,
+        isError,
+        error,
+        page,
+        setPage,
+        pageSize,
+        setPageSize,
+        filters,
+        setFilter,
+    } = useInventoryList();
 
     const GridColumns = "grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr]";
 
-    const [filters, setFilters] = useState({
-        search: "",
-        sortBy: "name",
-        sortOrder: "asc" as "asc" | "desc",
-        category: "all",
-    });
-
-    const handleFilterChange = useCallback(<K extends keyof typeof filters>(
-        key: K,
-        value: (typeof filters)[K]
-    ) => {
-        setFilters((prev) => ({ ...prev, [key]: value }));
-
-        // Switch to the first page if a user is applying filters
-        if (
-            (key === "search" && value.trim() !== "") ||
-            (key === "category" && value.trim() !== "all")
-        ) {
-            setPage(1);
-        }
-    }, []);
-
-    const handlePageSizeChange = (newSize: number) => {
-        setPageSize(newSize);
-        localStorage.setItem("inventoryPageSize", newSize.toString());
-    };
-
     const deleteMutation = useDeleteInventoryItem();
 
-    const { data, isLoading, error } = useQuery({
-        queryKey: ["/inventory/items", page, pageSize, filters],
-        queryFn: () =>
-            InventoryAPI.list({
-                page,
-                pageSize,
-                search: filters.search,
-                sortBy: filters.sortBy,
-                sortOrder: filters.sortOrder,
-                ...(filters.category !== "all" ? { category: filters.category } : {}),
-            }),
-        placeholderData: (previousData) => previousData
-    });
-
     if (isLoading) { return <p>Loading inventory items...</p>; }
-    if (error) { return <p className="text-red-600">Error: {(error as Error).message}</p>; }
+    if (isError) {
+        return (
+            <div className="border border-red-300 bg-red-50 text-red-700 px-3 py-2 rounded">
+                {error.message}
+            </div>
+        )
+    }
 
     return (
         <div className="w-full mx-auto">
             {/* Header / Controls */}
             <div className="flex justify-between items-center pb-6">
-                <h1 className="text-3xl font-bold">Items</h1>
+                <HeaderField label="Items" />
 
-                {/* Search / Filter / Sort */}
-                <div className="flex items-center gap-2">
+                <FilterBar
+                    filters={filters}
+                    onChange={setFilter}
+                    config={inventoryFilterConfig}
+                />
 
-                    {/* Search */}
-                    <SearchField onSearch={(value) => handleFilterChange("search", value)} />
-
-                    {/* Category */}
-                    <select
-                        value={filters.category ?? ""}
-                        onChange={(e) => handleFilterChange("category", e.target.value)}
-                        className={inputStyle}
-                    >
-                        <option value="all">All Categories</option>
-                        {Object.values(InventoryCategory).map((category) => (
-                            <option key={category} value={category}>
-                                {InventoryCategoryLabel[category]}
-                            </option>
-                        ))}
-                    </select>
-
-                    {/* Sort */}
-                    <label className="text-sm font-medium">Sort</label>
-
-                    <select
-                        value={filters.sortBy}
-                        onChange={(e) => handleFilterChange("sortBy", e.target.value)}
-                        className={inputStyle}
-                    >
-                        {Object.values(SortValues).map((value) => (
-                            <option key={value} value={value}>
-                                {SortValuesLabel[value]}
-                            </option>
-                        ))}
-                    </select>
-
-                    {/* Sort Order */}
-                    <button
-                        type="button"
-                        onClick={() =>
-                            handleFilterChange(
-                                "sortOrder",
-                                filters.sortOrder === "asc" ? "desc" : "asc"
-                            )
-                        }
-                        className={w18ButtonStyle}
-                    >
-                        {filters.sortOrder === "asc" ? "↑ Asc" : "↓ Desc"}
-                    </button>
-                </div>
-
-                {/* New Item */}
-                <NewButton url="/inventory/items/new" label="New Item" />
+                <PrimaryButton url="/inventory/items/new" label="New Item" />
             </div>
 
             {/* Table */}
-            <div className={tableStyle}>
+            <div className={`${tableClass}`}>
                 {/* Table Header */}
-                <div className={`${tableHeaderStyle} ${GridColumns}`}>
+                <div className={`${tableHeaderClass} ${GridColumns}`}>
                     <div>Name</div>
                     <div>SKU</div>
                     <div>Category</div>
@@ -181,14 +113,13 @@ export default function InventoryItems() {
                 </div>
             </div>
 
-            {/* Pagination */}
             <Pagination
                 page={page}
                 pageSize={pageSize}
                 isLoading={isLoading}
                 totalItems={data?.total ?? 0}
                 onPageChange={setPage}
-                onPageSizeChange={handlePageSizeChange}
+                onPageSizeChange={setPageSize}
             />
         </div>
     );

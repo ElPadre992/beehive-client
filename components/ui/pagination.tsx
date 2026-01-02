@@ -1,172 +1,10 @@
-import { newButtonStyle, paginationButtonStyle, subheaderStyle, w18ButtonStyle } from "@/lib/helpers/style";
-import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
-
-export function SubheaderField({ label }: { label: string }) {
-    return (
-        <>
-            <h2 className={subheaderStyle}>{label}</h2>
-            <hr className="mt-2 mb-4" />
-        </>
-    )
-}
-
-// **********************************
-// NEW BUTTON
-// **********************************
-
-interface NewButtonProps {
-    url: string;
-    label: string;
-}
-
-export function NewButton({ url, label }: NewButtonProps) {
-    return (
-        <Link href={url}>
-            <button className={newButtonStyle}>
-                {label}
-            </button>
-        </Link>
-    );
-}
-
-// **********************************
-// FORM FIELD
-// **********************************
-
-interface FormFieldProps {
-    label: string;
-    required?: boolean;
-    error?: string;
-    children: React.ReactNode;
-}
-
-export function FormField({ label, required, error, children }: FormFieldProps) {
-    return (
-        <div>
-            <div className="flex items-start mt-4">
-                <label className="w-35 font-medium mt-2">
-                    {label} {required && <span className="text-red-500">*</span>}
-                </label>
-
-                <div className="flex-1">{children}</div>
-            </div>
-            {error && <p className="text-red-600 mt-2">{error}</p>}
-        </div>
-    );
-}
-
-// **********************************
-// SELECT FIELD
-// **********************************
-
-interface SelectFieldProps {
-    label: string;
-    options: Record<string, string>;
-    required?: boolean;
-    error?: string;
-    register: any;
-    name: string;
-}
-
-export function SelectField({ label, options, required, error, register, name }: SelectFieldProps) {
-    return (
-        <FormField label={label} required={required} error={error}>
-            <select className="w-full border px-3 py-2 rounded-md" {...register(name)}>
-                {Object.entries(options).map(([value, label]) => (
-                    <option key={value} value={value}>
-                        {label}
-                    </option>
-                ))}
-            </select>
-        </FormField>
-    );
-}
-
-// **********************************
-// SEARCH FIELD
-// **********************************
-
-function isTypingInInput(target: EventTarget | null) {
-    return (
-        target instanceof HTMLInputElement ||
-        target instanceof HTMLTextAreaElement ||
-        (target instanceof HTMLElement && target.isContentEditable)
-    );
-}
-
-export function SearchField({
-    onSearch,
-}: {
-    onSearch: (value: string) => void;
-}) {
-    const [input, setInput] = useState("");
-    const inputRef = useRef<HTMLInputElement>(null);
-
-    /* Debounced search */
-    useEffect(() => {
-        const handler = setTimeout(() => {
-            onSearch(input);
-        }, 400);
-
-        return () => clearTimeout(handler);
-    }, [input, onSearch]);
-
-    /* "/" to focus search */
-    useEffect(() => {
-        const handler = (e: KeyboardEvent) => {
-            const target = e.target as HTMLElement;
-
-            if (e.key === "Escape") {
-                if (document.activeElement === inputRef.current) {
-                    setInput("");               // clear input
-                    onSearch("");               // propagate empty search
-                    inputRef.current?.blur();   // remove focus
-                }
-            }
-
-            // Don't steal focus while typing elsewhere
-            if (isTypingInInput(target)) return;
-
-
-
-            if ((e.key === "/" && !e.ctrlKey) || (e.ctrlKey && e.key.toLowerCase() === "k")) {
-                e.preventDefault();
-                inputRef.current?.focus();
-            }
-        };
-
-        window.addEventListener("keydown", handler);
-        return () => window.removeEventListener("keydown", handler);
-    }, []);
-
-    return (
-        <div className="relative">
-            <input
-                ref={inputRef}
-                type="text"
-                placeholder="Search…"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                className="border rounded-md px-3 py-2 text-sm w-full"
-            />
-
-            {/* Keyboard hint */}
-            <kbd
-                className="absolute right-2 top-1/2 -translate-y-1/2
-                           text-xs border rounded px-1.5 py-0.5
-                           text-muted-foreground bg-background"
-            >
-                /
-            </kbd>
-        </div>
-    );
-}
-
-
 // **********************************
 // PAGINATION
 // **********************************
+
+import { compactButtonClass, paginationButtonClass } from "@/styles/shared.classes";
+import { useEffect } from "react";
+import { IsTypingInInput } from "./form/search-field";
 
 interface PaginationProps {
     page: number;
@@ -198,7 +36,7 @@ export const Pagination: React.FC<PaginationProps> = ({
             const target = e.target as HTMLElement;
 
             if (isLoading) return;
-            if (isTypingInInput(target)) return;
+            if (IsTypingInInput(target)) return;
 
             switch (e.key) {
                 case 'ArrowRight':
@@ -219,6 +57,11 @@ export const Pagination: React.FC<PaginationProps> = ({
         window.addEventListener("keydown", handleKeyDown);
         return () => window.removeEventListener("keydown", handleKeyDown);
     }, [page, totalPages, isLoading, onPageChange]);
+
+    const handlePageSizeChange = (newSize: number) => {
+        onPageSizeChange(newSize);
+        localStorage.setItem("inventoryPageSize", newSize.toString());
+    };
 
     // Compute page numbers with ellipsis
     const getPageNumbers = (): (number | string)[] => {
@@ -261,10 +104,10 @@ export const Pagination: React.FC<PaginationProps> = ({
             <div>
                 <label className="mr-2">Items per page:</label>
                 <select
-                    className={w18ButtonStyle}
+                    className={compactButtonClass}
                     value={pageSize}
                     onChange={(e) => {
-                        onPageSizeChange(Number(e.target.value));
+                        handlePageSizeChange(Number(e.target.value));
                         onPageChange(1);
                     }}
                     disabled={isLoading}
@@ -289,7 +132,7 @@ export const Pagination: React.FC<PaginationProps> = ({
                     <button
                         disabled={page === 1 || isLoading}
                         onClick={() => onPageChange(1)}
-                        className={paginationButtonStyle}
+                        className={paginationButtonClass}
                     >
                         {"<<"}
                     </button>
@@ -297,7 +140,7 @@ export const Pagination: React.FC<PaginationProps> = ({
                     <button
                         disabled={page === 1 || isLoading}
                         onClick={() => onPageChange(page - 1)}
-                        className={paginationButtonStyle}
+                        className={paginationButtonClass}
                     >
                         {"<"}
                     </button>
@@ -322,7 +165,7 @@ export const Pagination: React.FC<PaginationProps> = ({
                     <button
                         disabled={page === totalPages || isLoading}
                         onClick={() => onPageChange(page + 1)}
-                        className={paginationButtonStyle}
+                        className={paginationButtonClass}
                     >
                         {">"}
                     </button>
@@ -330,7 +173,7 @@ export const Pagination: React.FC<PaginationProps> = ({
                     <button
                         disabled={page === totalPages || isLoading}
                         onClick={() => onPageChange(totalPages)}
-                        className={paginationButtonStyle}
+                        className={paginationButtonClass}
                     >
                         {">>"}
                     </button>
