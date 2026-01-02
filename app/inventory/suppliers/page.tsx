@@ -1,16 +1,16 @@
 "use client";
 
 import { NewButton, Pagination, SearchField } from "@/components/ui-components";
-import { SupplierAPI, useDeleteInventorySupplier } from "@/lib/api/inventory/suppliers";
+import { SupplierAPI, useDeleteSupplier } from "@/lib/api/inventory/suppliers";
 import { SortValues, SortValuesLabel } from "@/lib/enums/inventory/suppliers";
 import { useLocalStorageState } from "@/lib/helpers/common";
 import { infoParagraphStyle, inputStyle, tableHeaderStyle, tableRowStyle, tableStyle, w18ButtonStyle } from "@/lib/helpers/style";
-import { InventorySupplier } from "@/lib/schemas/inventory/supplier.schema";
+import { Supplier } from "@/lib/schemas/inventory/supplier.schema";
 import { useQuery } from "@tanstack/react-query";
 import { useCallback, useState } from "react";
 
 interface InventoryTableProps {
-    items: InventorySupplier[];
+    items: Supplier[];
     isLoading: boolean;
     onDelete: (id: number) => void;
     columnStyle: string
@@ -20,7 +20,7 @@ function InventoryTable({ items, isLoading, onDelete, columnStyle }: InventoryTa
     return (
         <>
             {isLoading ? (
-                <p className={infoParagraphStyle}>Loading items…</p>
+                <p className={infoParagraphStyle}>Loading suppliers…</p>
             ) : items.length === 0 ? (
                 <p className={infoParagraphStyle}>
                     No suppliers match your filters.
@@ -47,7 +47,7 @@ function InventoryTable({ items, isLoading, onDelete, columnStyle }: InventoryTa
     );
 }
 
-export default function InventorySuppliers() {
+export default function Suppliers() {
     const [page, setPage] = useLocalStorageState("inventoryPage", 1);
     const [pageSize, setPageSize] = useLocalStorageState("inventoryPageSize", 20);
 
@@ -86,7 +86,7 @@ export default function InventorySuppliers() {
         placeholderData: (previousData) => previousData
     });
 
-    const deleteMutation = useDeleteInventorySupplier();
+    const deleteMutation = useDeleteSupplier();
 
     const handlePageSizeChange = (newSize: number) => {
         setPageSize(newSize);
@@ -191,8 +191,4 @@ export default function InventorySuppliers() {
             />
         </div>
     )
-}
-
-function useDeleteSupplier() {
-    throw new Error("Function not implemented.");
 }

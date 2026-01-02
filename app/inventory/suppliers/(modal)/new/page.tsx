@@ -2,9 +2,9 @@
 
 import DrawerShell from "@/components/drawer-shell";
 import { FormField, SubheaderField } from "@/components/ui-components";
-import { useCreateInventorySupplier } from "@/lib/api/inventory/suppliers";
+import { useCreateSupplier } from "@/lib/api/inventory/suppliers";
 import { fullWidthInputStyle } from "@/lib/helpers/style";
-import { SupplierFormValues, inventorySupplierSchema } from "@/lib/schemas/inventory/supplier.schema";
+import { SupplierFormValues, SupplierSchema } from "@/lib/schemas/inventory/supplier.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -15,7 +15,7 @@ export default function NewSupplierPage() {
     const [formError, setFormError] = useState<string | null>(null);
 
     const form = useForm<SupplierFormValues>({
-        resolver: zodResolver(inventorySupplierSchema),
+        resolver: zodResolver(SupplierSchema),
         defaultValues: {
             name: "",
             address: "",
@@ -33,7 +33,7 @@ export default function NewSupplierPage() {
 
     const router = useRouter();
 
-    const createMutation = useCreateInventorySupplier();
+    const createMutation = useCreateSupplier();
 
     const onSubmit = (data: SupplierFormValues) => {
         setFormError(null);

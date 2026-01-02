@@ -1,13 +1,13 @@
 import { z } from "zod";
-import { inventorySupplierContactSchema } from "./supplier-contact.schema";
+import { SupplierContactSchema } from "./supplier-contact.schema";
 
-export const inventorySupplierSchema = z
+export const SupplierSchema = z
     .object({
         name: z.string().min(1, "Company name is required"),
         address: z.string().optional(),
         notes: z.string().optional(),
         contacts: z
-            .array(inventorySupplierContactSchema)
+            .array(SupplierContactSchema)
             .optional()
             .refine(
                 contacts =>
@@ -18,9 +18,9 @@ export const inventorySupplierSchema = z
     })
 
 export type SupplierFormValues = z.infer<
-    typeof inventorySupplierSchema
+    typeof SupplierSchema
 >
 
-export type InventorySupplier = SupplierFormValues & {
+export type Supplier = SupplierFormValues & {
     id: number
 }

@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const inventorySupplierContactSchema = z
+export const SupplierContactSchema = z
     .object({
         name: z.string().min(1, "Contact name is required"),
         email: z.email("Valid Email address is required"),
@@ -9,10 +9,10 @@ export const inventorySupplierContactSchema = z
         isPrimary: z.boolean().optional()
     })
 
-export type InventorySupplierContactFormValues = z.infer<
-    typeof inventorySupplierContactSchema
+export type SupplierContactFormValues = z.infer<
+    typeof SupplierContactSchema
 >
 
-export type InventorySupplier = InventorySupplierContactFormValues & {
+export type SupplierContact = SupplierContactFormValues & {
     id: number
 }
