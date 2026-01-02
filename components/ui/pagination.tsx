@@ -2,9 +2,8 @@
 // PAGINATION
 // **********************************
 
+import { usePaginationShortcuts } from "@/hooks/ui/use-pagination-shortcuts";
 import { compactButtonClass, paginationButtonClass } from "@/styles/shared.classes";
-import { useEffect } from "react";
-import { IsTypingInInput } from "./form/search-field";
 
 interface PaginationProps {
     page: number;
@@ -29,34 +28,7 @@ export const Pagination: React.FC<PaginationProps> = ({
 }) => {
     const totalPages = Math.ceil(totalItems / pageSize) || 1;
 
-    useEffect(() => {
-        if (isLoading) return;
-
-        const handleKeyDown = (e: KeyboardEvent) => {
-            const target = e.target as HTMLElement;
-
-            if (isLoading) return;
-            if (IsTypingInInput(target)) return;
-
-            switch (e.key) {
-                case 'ArrowRight':
-                    if (page < totalPages) onPageChange(page + 1);
-                    break;
-                case 'ArrowLeft':
-                    if (page > 1) onPageChange(page - 1);
-                    break;
-                case 'ArrowUp':
-                    onPageChange(1);
-                    break;
-                case 'ArrowDown':
-                    onPageChange(totalPages);
-                    break;
-            }
-        };
-
-        window.addEventListener("keydown", handleKeyDown);
-        return () => window.removeEventListener("keydown", handleKeyDown);
-    }, [page, totalPages, isLoading, onPageChange]);
+    usePaginationShortcuts({ page, totalPages, isLoading, onPageChange });
 
     const handlePageSizeChange = (newSize: number) => {
         onPageSizeChange(newSize);

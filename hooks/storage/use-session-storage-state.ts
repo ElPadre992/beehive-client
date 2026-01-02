@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 
 /**
- * useLocalStorageState hook
- * Stores state in localStorage (survives page reloads, browser restarts, and even closing the tab)
+ * useSessionStorageState hook
+ * Stores state in sessionStorage (cleared when the tab is closed)
  */
-export function useLocalStorageState<T>(key: string, defaultValue: T) {
+export function useSessionStorageState<T>(key: string, defaultValue: T) {
     const [state, setState] = useState<T>(() => {
         if (typeof window !== "undefined") {
-            const stored = localStorage.getItem(key);
+            const stored = sessionStorage.getItem(key);
             return stored ? JSON.parse(stored) : defaultValue;
         }
         return defaultValue;
@@ -15,7 +15,7 @@ export function useLocalStorageState<T>(key: string, defaultValue: T) {
 
     useEffect(() => {
         if (typeof window !== "undefined") {
-            localStorage.setItem(key, JSON.stringify(state));
+            sessionStorage.setItem(key, JSON.stringify(state));
         }
     }, [key, state]);
 
