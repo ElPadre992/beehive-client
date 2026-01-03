@@ -1,6 +1,6 @@
 import { InventoryItem, InventoryItemFormValues, inventoryItemSchema } from "@/features/inventory/items/item.schema";
 import { apiFetch } from "@/lib/api";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 
 export interface ListInventoryItemParams {
     page?: number;
@@ -50,7 +50,7 @@ export const InventoryItemAPI = {
 // React Query Hooks
 // ----------------------------------
 export const useCreateInventoryItem = () => {
-    const queryClient = useQueryClient()
+    // const queryClient = useQueryClient()
 
     return useMutation<InventoryItem, Error, InventoryItemFormValues>({
         mutationFn: InventoryItemAPI.create,
@@ -64,14 +64,14 @@ export const useCreateInventoryItem = () => {
 }
 
 export const useDeleteInventoryItem = () => {
-    const queryClient = useQueryClient()
+    // const queryClient = useQueryClient()
 
     return useMutation<InventoryItem, Error, number>({
         mutationFn: InventoryItemAPI.delete,
         onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ["inventory/items"],
-            });
+            // queryClient.invalidateQueries({
+            //     queryKey: ["inventory/items"],
+            // });
         },
         onError: (error) => console.error("Failed to delete item:", error.message),
     })

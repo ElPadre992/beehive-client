@@ -4,27 +4,7 @@ import {
     InventoryFilters,
     SortValues, SortValuesLabel
 } from "@/features/inventory/items/item.types";
-
-export type FilterConfig<T> =
-    | {
-        type: "search";
-        key: keyof T;
-        placeholder?: string;
-    }
-    | {
-        type: "select";
-        key: keyof T;
-        options: { value: string; label: string }[];
-    }
-    | {
-        type: "sort";
-        key: keyof T;
-        options: { value: string; label: string }[];
-    }
-    | {
-        type: "sortOrder";
-        key: keyof T;
-    };
+import { FilterConfig } from "@/features/shared/filter-config";
 
 export const inventoryFilterConfig = [
     {

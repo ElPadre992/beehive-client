@@ -1,17 +1,15 @@
 "use client";
 
 import { PrimaryButton } from "@/components/ui/buttons/primary-button";
-import { SearchField } from "@/components/ui/form/search-field";
+import { FilterBar } from "@/components/ui/fillter-bar";
 import { Pagination } from "@/components/ui/pagination";
 import { HeaderField } from "@/components/ui/text/text-fields";
+import { useSuppliersList } from "@/features/inventory/suppliers/hooks/use-suppliers-list";
 import { useSuppliersRealtime } from "@/features/inventory/suppliers/hooks/use-suppliers-realtime";
-import { SupplierAPI, useDeleteSupplier } from "@/features/inventory/suppliers/supplier.api";
+import { useDeleteSupplier } from "@/features/inventory/suppliers/supplier.api";
+import { supplierFilterConfig } from "@/features/inventory/suppliers/supplier.filters";
 import { Supplier } from "@/features/inventory/suppliers/supplier.schema";
-import { SortValues, SortValuesLabel } from "@/features/inventory/suppliers/supplier.types";
-import { useLocalStorageState } from "@/hooks/storage/use-local-storage-state";
-import { compactButtonClass, infoParagraphClass, inputClass, tableClass, tableHeaderClass, tableRowClass } from "@/styles/shared.classes";
-import { useQuery } from "@tanstack/react-query";
-import { useCallback, useState } from "react";
+import { infoParagraphClass, tableClass, tableHeaderClass, tableRowClass } from "@/styles/shared.classes";
 
 interface InventoryTableProps {
     items: Supplier[];
@@ -54,56 +52,26 @@ function InventoryTable({ items, isLoading, onDelete, columnStyle }: InventoryTa
 export default function Suppliers() {
     useSuppliersRealtime();
 
-    const [page, setPage] = useLocalStorageState("inventoryPage", 1);
-    const [pageSize, setPageSize] = useLocalStorageState("inventoryPageSize", 20);
-
-    const [filters, setFilters] = useState({
-        search: "",
-        sortBy: "name",
-        sortOrder: "asc" as "asc" | "desc",
-    });
-
-    const handleFilterChange = useCallback(<K extends keyof typeof filters>(
-        key: K,
-        value: (typeof filters)[K]
-    ) => {
-        setFilters((prev) => ({ ...prev, [key]: value }));
-
-        // Switch to the first page if a user is applying filters
-        if (
-            (key === "search" && value.trim() !== "")
-        ) {
-            setPage(1);
-        }
-    }, []);
-
-    const handlePageSizeChange = (newSize: number) => {
-        setPageSize(newSize);
-        localStorage.setItem("inventoryPageSize", newSize.toString());
-    };
+    const {
+        data,
+        isLoading,
+        isError,
+        error,
+        page,
+        setPage,
+        pageSize,
+        setPageSize,
+        filters,
+        setFilter,
+    } = useSuppliersList();
 
     const GridColumns = "grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_1fr]";
 
-    const { data, isLoading, error } = useQuery({
-        queryKey: ["/inventory/suppliers", page, pageSize, filters],
-        queryFn: () =>
-            SupplierAPI.list({
-                page,
-                pageSize,
-                search: filters.search,
-                sortBy: filters.sortBy,
-                sortOrder: filters.sortOrder,
-            }),
-        placeholderData: (previousData) => previousData
-    });
-
     const deleteMutation = useDeleteSupplier();
-
-
 
     if (isLoading) { return <p>Loading inventory suppliers...</p>; }
 
-    if (error) {
+    if (isError) {
         return (
             <div className="border border-red-300 bg-red-50 text-red-700 px-3 py-2 rounded">
                 {error.message}
@@ -117,55 +85,11 @@ export default function Suppliers() {
             <div className="flex justify-between items-center pb-6">
                 <HeaderField label="Suppliers" />
 
-                {/* Search / Filter / Sort */}
-                <div className="flex items-center gap-2">
-
-                    {/* Search */}
-                    <SearchField onSearch={(value) => handleFilterChange("search", value)} />
-
-                    {/* Category */}
-                    {/* <select
-                        value={filters.category ?? ""}
-                        onChange={(e) => handleFilterChange("category", e.target.value)}
-                        className={inputStyle}
-                    >
-                        <option value="all">All Categories</option>
-                        {Object.values(InventoryCategory).map((category) => (
-                            <option key={category} value={category}>
-                                {InventoryCategoryLabel[category]}
-                            </option>
-                        ))}
-                    </select> */}
-
-                    {/* Sort */}
-                    <label className="text-sm font-medium">Sort</label>
-
-                    <select
-                        value={filters.sortBy}
-                        onChange={(e) => handleFilterChange("sortBy", e.target.value)}
-                        className={inputClass}
-                    >
-                        {Object.values(SortValues).map((value) => (
-                            <option key={value} value={value}>
-                                {SortValuesLabel[value]}
-                            </option>
-                        ))}
-                    </select>
-
-                    {/* Sort Order */}
-                    <button
-                        type="button"
-                        onClick={() =>
-                            handleFilterChange(
-                                "sortOrder",
-                                filters.sortOrder === "asc" ? "desc" : "asc"
-                            )
-                        }
-                        className={compactButtonClass}
-                    >
-                        {filters.sortOrder === "asc" ? "↑ Asc" : "↓ Desc"}
-                    </button>
-                </div>
+                <FilterBar
+                    filters={filters}
+                    onChange={setFilter}
+                    config={supplierFilterConfig}
+                />
 
                 {/* New Item */}
                 <PrimaryButton url="/inventory/suppliers/new" label="New Supplier" />
@@ -202,7 +126,7 @@ export default function Suppliers() {
                 isLoading={isLoading}
                 totalItems={data?.total ?? 0}
                 onPageChange={setPage}
-                onPageSizeChange={handlePageSizeChange}
+                onPageSizeChange={setPageSize}
             />
         </div>
     )
