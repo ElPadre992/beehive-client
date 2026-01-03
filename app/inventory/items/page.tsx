@@ -4,6 +4,7 @@ import { PrimaryButton } from "@/components/ui/buttons/primary-button";
 import { FilterBar } from "@/components/ui/fillter-bar";
 import { Pagination } from "@/components/ui/pagination";
 import { HeaderField } from "@/components/ui/text/text-fields";
+import { useInventoryItemsRealtime } from "@/features/inventory/items/hooks/use-inventory-items-realtime";
 import { useInventoryList } from "@/features/inventory/items/hooks/use-inventory-list";
 import { useDeleteInventoryItem } from "@/features/inventory/items/item.api";
 import { inventoryFilterConfig } from "@/features/inventory/items/item.filters";
@@ -49,6 +50,8 @@ function InventoryTable({ items, isLoading, onDelete, columnStyle }: InventoryTa
 }
 
 export default function InventoryItems() {
+    useInventoryItemsRealtime();
+
     const {
         data,
         isLoading,

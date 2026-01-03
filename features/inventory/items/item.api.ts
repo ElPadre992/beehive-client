@@ -55,9 +55,9 @@ export const useCreateInventoryItem = () => {
     return useMutation<InventoryItem, Error, InventoryItemFormValues>({
         mutationFn: InventoryItemAPI.create,
         onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ["/inventory/items"],
-            });
+            // queryClient.invalidateQueries({
+            //     queryKey: ["/inventory/items"],
+            // });
         },
         onError: (error) => console.error("Failed to create item:", error.message),
     })
