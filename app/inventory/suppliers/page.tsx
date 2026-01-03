@@ -4,6 +4,7 @@ import { PrimaryButton } from "@/components/ui/buttons/primary-button";
 import { SearchField } from "@/components/ui/form/search-field";
 import { Pagination } from "@/components/ui/pagination";
 import { HeaderField } from "@/components/ui/text/text-fields";
+import { useSuppliersRealtime } from "@/features/inventory/suppliers/hooks/use-suppliers-realtime";
 import { SupplierAPI, useDeleteSupplier } from "@/features/inventory/suppliers/supplier.api";
 import { Supplier } from "@/features/inventory/suppliers/supplier.schema";
 import { SortValues, SortValuesLabel } from "@/features/inventory/suppliers/supplier.types";
@@ -51,6 +52,8 @@ function InventoryTable({ items, isLoading, onDelete, columnStyle }: InventoryTa
 }
 
 export default function Suppliers() {
+    useSuppliersRealtime();
+
     const [page, setPage] = useLocalStorageState("inventoryPage", 1);
     const [pageSize, setPageSize] = useLocalStorageState("inventoryPageSize", 20);
 
