@@ -9,7 +9,7 @@ import { useSuppliersRealtime } from "@/features/inventory/suppliers/hooks/use-s
 import { useDeleteSupplier } from "@/features/inventory/suppliers/supplier.api";
 import { supplierFilterConfig } from "@/features/inventory/suppliers/supplier.filters";
 import { Supplier } from "@/features/inventory/suppliers/supplier.schema";
-import { infoParagraphClass, tableClass, tableHeaderClass, tableRowClass } from "@/styles/shared.classes";
+import { errorClass, infoParagraphClass, tableClass, tableHeaderClass, tableRowClass } from "@/styles/shared.classes";
 
 interface InventoryTableProps {
     items: Supplier[];
@@ -71,13 +71,7 @@ export default function Suppliers() {
 
     if (isLoading) { return <p>Loading inventory suppliers...</p>; }
 
-    if (isError) {
-        return (
-            <div className="border border-red-300 bg-red-50 text-red-700 px-3 py-2 rounded">
-                {error.message}
-            </div>
-        )
-    }
+    if (isError) { return (<p className={errorClass}>{error.message}</p>) }
 
     return (
         <div className="w-full mx-auto">

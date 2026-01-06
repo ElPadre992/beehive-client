@@ -1,4 +1,4 @@
-import { InventoryItem, InventoryItemFormValues, inventoryItemSchema } from "@/features/inventory/items/item.schema";
+import { InventoryItem, inventoryItemCreateSchema, InventoryItemCreateValues, inventoryItemUpdateSchema, InventoryItemUpdateValues } from "@/features/inventory/items/item.schema";
 import { apiFetch } from "@/lib/api";
 import { useMutation } from "@tanstack/react-query";
 
@@ -27,9 +27,11 @@ export const InventoryItemAPI = {
             `/inventory/items?${new URLSearchParams(params as any)}`
         ),
 
-    create: async (item: InventoryItemFormValues) => {
+    getById: async (id: number) => apiFetch<InventoryItem>(`/inventory/items/${id}`),
+
+    create: async (item: InventoryItemCreateValues) => {
         // Optional extra validation on API side
-        const parsed = inventoryItemSchema.safeParse(item)
+        const parsed = inventoryItemCreateSchema.safeParse(item)
         if (!parsed.success) {
             throw new Error(parsed.error.issues.map(issue => issue.message).join(", "))
         }
@@ -40,39 +42,50 @@ export const InventoryItemAPI = {
         })
     },
 
-    delete: (id: number) =>
-        apiFetch<InventoryItem>(`/inventory/items/${id}`, {
-            method: "DELETE",
-        }),
+    update: async (id: number, item: InventoryItemUpdateValues) => {
+        const parsed = inventoryItemUpdateSchema.safeParse(item)
+        if (!parsed.success) {
+            throw new Error(
+                parsed.error.issues.map(issue => issue.message).join(", ")
+            )
+        }
+
+        return apiFetch<InventoryItem>(`/inventory/items/${id}`, {
+            method: "PATCH",
+            body: JSON.stringify(parsed.data),
+        })
+    },
+
+    delete: (id: number) => apiFetch<InventoryItem>(`/inventory/items/${id}`, { method: "DELETE", }),
 }
 
 // ----------------------------------
 // React Query Hooks
 // ----------------------------------
 export const useCreateInventoryItem = () => {
-    // const queryClient = useQueryClient()
-
-    return useMutation<InventoryItem, Error, InventoryItemFormValues>({
+    return useMutation<InventoryItem, Error, InventoryItemCreateValues>({
         mutationFn: InventoryItemAPI.create,
-        onSuccess: () => {
-            // queryClient.invalidateQueries({
-            //     queryKey: ["/inventory/items"],
-            // });
-        },
         onError: (error) => console.error("Failed to create item:", error.message),
     })
 }
 
-export const useDeleteInventoryItem = () => {
-    // const queryClient = useQueryClient()
+type InventoryItemPayload = {
+    id: number
+    data: InventoryItemUpdateValues
+}
 
+export const useUpdateInventoryItem = () => {
+    return useMutation<InventoryItem, Error, InventoryItemPayload>({
+        mutationFn: ({ id, data }) =>
+            InventoryItemAPI.update(id, data),
+
+        onError: (error) => console.error("Failed to update item:", error.message),
+    })
+}
+
+export const useDeleteInventoryItem = () => {
     return useMutation<InventoryItem, Error, number>({
         mutationFn: InventoryItemAPI.delete,
-        onSuccess: () => {
-            // queryClient.invalidateQueries({
-            //     queryKey: ["inventory/items"],
-            // });
-        },
         onError: (error) => console.error("Failed to delete item:", error.message),
     })
 }

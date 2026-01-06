@@ -16,10 +16,12 @@ export function useInventoryItemsRealtime() {
         };
 
         socket.on("itemCreated", invalidate);
+        socket.on("itemUpdated", invalidate);
         socket.on("itemDeleted", invalidate);
 
         return () => {
             socket.off("itemCreated", invalidate);
+            socket.off("itemUpdated", invalidate);
             socket.off("itemDeleted", invalidate);
         };
     }, [socket, queryClient]);

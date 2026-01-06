@@ -4,13 +4,14 @@ import { PrimaryButton } from "@/components/ui/buttons/primary-button";
 import { FilterBar } from "@/components/ui/fillter-bar";
 import { Pagination } from "@/components/ui/pagination";
 import { HeaderField } from "@/components/ui/text/text-fields";
+import ItemsDropdownMenu from "@/features/inventory/items/components/dropdown-menu";
 import { useInventoryList } from "@/features/inventory/items/hooks/use-inventory-items-list";
 import { useInventoryItemsRealtime } from "@/features/inventory/items/hooks/use-inventory-items-realtime";
 import { useDeleteInventoryItem } from "@/features/inventory/items/item.api";
 import { inventoryFilterConfig } from "@/features/inventory/items/item.filters";
 import { InventoryItem } from "@/features/inventory/items/item.schema";
 import { InventoryCategoryLabel, UnitOfMeasureLabel } from "@/features/inventory/items/item.types";
-import { infoParagraphClass, tableClass, tableHeaderClass, tableRowClass } from "@/styles/shared.classes";
+import { errorClass, infoParagraphClass, tableClass, tableHeaderClass, tableRowClass } from "@/styles/shared.classes";
 
 interface InventoryTableProps {
     items: InventoryItem[];
@@ -36,12 +37,7 @@ function InventoryTable({ items, isLoading, onDelete, columnStyle }: InventoryTa
                         <div>{InventoryCategoryLabel[item.category]}</div>
                         <div>{item.quantity}</div>
                         <div>{UnitOfMeasureLabel[item.unit]}</div>
-                        <button
-                            onClick={() => onDelete(item.id)}
-                            className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded-md"
-                        >
-                            Delete
-                        </button>
+                        <div className=""><ItemsDropdownMenu id={item.id} onDelete={onDelete} /></div>
                     </div>
                 ))
             )}
@@ -70,13 +66,7 @@ export default function InventoryItems() {
     const deleteMutation = useDeleteInventoryItem();
 
     if (isLoading) { return <p>Loading inventory items...</p>; }
-    if (isError) {
-        return (
-            <div className="border border-red-300 bg-red-50 text-red-700 px-3 py-2 rounded">
-                {error.message}
-            </div>
-        )
-    }
+    if (isError) { return (<p className={errorClass}>{error.message}</p>) }
 
     return (
         <div className="w-full mx-auto">

@@ -5,7 +5,7 @@ import { FormField } from "@/components/ui/form/form-field";
 import { SelectField } from "@/components/ui/form/select-field";
 import { SubheaderField } from "@/components/ui/text/text-fields";
 import { useCreateInventoryItem } from "@/features/inventory/items/item.api";
-import { InventoryItemFormValues, inventoryItemSchema } from "@/features/inventory/items/item.schema";
+import { inventoryItemCreateSchema, InventoryItemCreateValues } from "@/features/inventory/items/item.schema";
 import { InventoryCategoryLabel, UnitOfMeasureLabel } from "@/features/inventory/items/item.types";
 import { fullWidthInputClass } from "@/styles/shared.classes";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -16,9 +16,8 @@ import { useForm } from "react-hook-form";
 export default function NewItemPage() {
     const [formError, setFormError] = useState<string | null>(null);
 
-    const form = useForm<InventoryItemFormValues>({
-        resolver: zodResolver(inventoryItemSchema),
-        defaultValues: { quantity: 0 },
+    const form = useForm<InventoryItemCreateValues>({
+        resolver: zodResolver(inventoryItemCreateSchema),
     });
 
     const { register, handleSubmit, formState, reset } = form;
@@ -28,7 +27,7 @@ export default function NewItemPage() {
 
     const createMutation = useCreateInventoryItem();
 
-    const onSubmit = (data: InventoryItemFormValues) => {
+    const onSubmit = (data: InventoryItemCreateValues) => {
         setFormError(null);
         createMutation.mutate(data, {
             onError: (error: any) => setFormError(error?.message || "Something went wrong"),

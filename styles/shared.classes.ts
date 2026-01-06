@@ -27,3 +27,11 @@ export const fullWidthInputClass = `w-full ${inputClass}`
 
 export const subheaderClass = "text-lg font-semibold"
 export const infoParagraphClass = "px-3 py-2 text-sm text-gray-500"
+export const errorClass = "border border-red-300 bg-red-50 text-red-700 px-3 py-2 rounded"
+
+// ***************
+// SHAPES
+// ***************
+
+export const circleClass = "h-2 w-2 rounded-full";
+export const largeCircleClass = "h-3 w-3 rounded-full";
