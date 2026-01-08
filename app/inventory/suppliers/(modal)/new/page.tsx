@@ -25,12 +25,27 @@ export default function NewSupplierPage() {
         }
     });
 
-    const { register, control, handleSubmit, formState, reset } = form;
+    const { register, control, handleSubmit, formState, reset, setValue, getValues } = form;
     const { errors, isSubmitting } = formState;
     const { fields, append, remove } = useFieldArray({
         control,
         name: "contacts"
     });
+
+    const removeContact = (index: number) => {
+        const contacts = getValues("contacts");
+
+        const removedWasPrimary = contacts?.[index]?.isPrimary;
+
+        // Remove the contact
+        remove(index);
+
+        // If we removed the primary contact, promote the first remaining one
+        if (removedWasPrimary && contacts && contacts.length > 1) {
+            // After removal, the new first contact is index 0
+            setValue("contacts.0.isPrimary", true);
+        }
+    };
 
     const router = useRouter();
 
@@ -90,32 +105,6 @@ export default function NewSupplierPage() {
                         />
                     </FormField>
 
-                    {/* <FormField label="Contact" required error={errors.contact?.message}>
-                        <input
-                            className={fullWidthInputStyle}
-                            placeholder="Contact"
-                            {...register("contact")}
-                        />
-                    </FormField>
-
-                    <FormField label="Email" required error={errors.email?.message}>
-                        <input
-                            type="email"
-                            className={fullWidthInputStyle}
-                            placeholder="someone@email.com"
-                            {...register("email")}
-                        />
-                    </FormField>
-
-                    <FormField label="Phone" error={errors.phone?.message}>
-                        <input
-                            type="number"
-                            className={fullWidthInputStyle}
-                            placeholder="Phone number"
-                            {...register("phone")}
-                        />
-                    </FormField> */}
-
                     <FormField label="Address" error={errors.address?.message}>
                         <input
                             className={fullWidthInputClass}
@@ -139,7 +128,7 @@ export default function NewSupplierPage() {
                     <SupplierContacts
                         fields={fields}
                         register={register}
-                        remove={remove}
+                        remove={removeContact}
                         append={append}
                         errors={errors}
                     />

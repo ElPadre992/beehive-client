@@ -33,7 +33,7 @@ export function SupplierContacts({
                             email: "",
                             phone: "",
                             notes: "",
-                            isPrimary: false
+                            isPrimary: fields.length === 0
                         })
                     }
                 >
@@ -67,7 +67,7 @@ export function SupplierContacts({
 
                         <FormField label="Phone" error={errors.contacts?.[index]?.phone?.message}>
                             <input
-                                type="number"
+                                type="text"
                                 className={fullWidthInputClass}
                                 placeholder="Phone number"
                                 {...register(
@@ -87,24 +87,29 @@ export function SupplierContacts({
                             />
                         </FormField>
 
-                        <div>
-                            <label>
-                                <input
-                                    type="checkbox"
-                                    {...register(
-                                        `contacts.${index}.isPrimary`
-                                    )}
-                                />
-                                Primary contact
-                            </label>
+                        <div className="flex mt-2 justify-between">
+                            <div className="flex gap-2 py-2 border rounded-md px-2">
+                                <span className="font-bold">Primary contact</span>
+                                <label className="mt-0.5">
+                                    <input
+                                        type="checkbox"
+                                        {...register(
+                                            `contacts.${index}.isPrimary`
+                                        )}
+                                    />
+
+                                </label>
+                            </div>
+                            <button
+                                type="button"
+                                className="px-4 py-2 border rounded-md bg-red-500 text-white"
+                                onClick={() => remove(index)}
+                            >
+                                Remove
+                            </button>
                         </div>
 
-                        <button
-                            type="button"
-                            onClick={() => remove(index)}
-                        >
-                            Remove
-                        </button>
+
                     </div>
                 </div>
             ))}

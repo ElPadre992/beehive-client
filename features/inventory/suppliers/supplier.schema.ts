@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { SupplierContactSchema } from "./supplier-contact.schema";
+import { SupplierContactApi, SupplierContactInput } from "./supplier-contact.schema";
 
 export const SupplierSchema = z
     .object({
@@ -7,7 +7,7 @@ export const SupplierSchema = z
         address: z.string().optional(),
         notes: z.string().optional(),
         contacts: z
-            .array(SupplierContactSchema)
+            .array(SupplierContactInput)
             .optional()
             .refine(
                 contacts =>
@@ -17,10 +17,22 @@ export const SupplierSchema = z
             )
     })
 
+export const SupplierApiSchema = z
+    .object({
+        name: z.string().min(1, "Company name is required"),
+        address: z.string().optional(),
+        notes: z.string().optional(),
+        contacts: z.array(SupplierContactApi)
+    })
+
+export type SupplierApi = z.infer<
+    typeof SupplierApiSchema
+>
+
 export type SupplierFormValues = z.infer<
     typeof SupplierSchema
 >
 
-export type Supplier = SupplierFormValues & {
+export type Supplier = SupplierApi & {
     id: number
 }

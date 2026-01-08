@@ -145,3 +145,16 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+/* Remove default <summary> caret */
+summary {
+  list-style: none;
+}
+
+summary::-webkit-details-marker {
+  display: none;
+}
+
+summary::marker {
+  display: none;
+}

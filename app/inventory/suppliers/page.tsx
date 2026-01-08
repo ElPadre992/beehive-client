@@ -4,6 +4,7 @@ import { PrimaryButton } from "@/components/ui/buttons/primary-button";
 import { FilterBar } from "@/components/ui/fillter-bar";
 import { Pagination } from "@/components/ui/pagination";
 import { HeaderField } from "@/components/ui/text/text-fields";
+import SuppliersDropdownMenu from "@/features/inventory/suppliers/components/dropdown-menu";
 import { useSuppliersList } from "@/features/inventory/suppliers/hooks/use-suppliers-list";
 import { useSuppliersRealtime } from "@/features/inventory/suppliers/hooks/use-suppliers-realtime";
 import { useDeleteSupplier } from "@/features/inventory/suppliers/supplier.api";
@@ -36,12 +37,13 @@ function InventoryTable({ items, isLoading, onDelete, columnStyle }: InventoryTa
                         <div>{item.contacts ? (item.contacts[0]?.name) : ""}</div>
                         <div>{item.contacts ? (item.contacts[0]?.email) : ""}</div>
                         <div>{item.contacts ? (item.contacts[0]?.phone) : ""}</div>
-                        <button
+                        {/* <button
                             onClick={() => onDelete(item.id)}
                             className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded-md"
                         >
                             Delete
-                        </button>
+                        </button> */}
+                        <div className=""><SuppliersDropdownMenu id={item.id} onDelete={onDelete} /></div>
                     </div>
                 ))
             )}

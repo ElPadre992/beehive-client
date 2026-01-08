@@ -30,7 +30,7 @@ export default async function RootLayout({
             <AppSidebar />
 
             {/* Page content */}
-            <main className="flex p-6 w-full min-w-5xl bg-zinc-50 text-gray-900">
+            <main className="flex p-6 w-full bg-zinc-50 text-gray-900">
               <ReactQueryProvider>{children}</ReactQueryProvider>
             </main>
           </SidebarProvider>

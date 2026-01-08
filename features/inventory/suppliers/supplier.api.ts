@@ -23,6 +23,7 @@ export const SupplierAPI = {
             `/inventory/suppliers?${new URLSearchParams(params as any)}`
         ),
 
+    getById: async (id: number) => apiFetch<Supplier>(`/inventory/suppliers/${id}`),
 
     create: (supplier: SupplierFormValues) => {
         // Optional extra validation on API side
