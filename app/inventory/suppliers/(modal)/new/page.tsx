@@ -4,7 +4,7 @@ import DrawerShell from "@/components/ui/drawer-shell";
 import { FormField } from "@/components/ui/form/form-field";
 import { SubheaderField } from "@/components/ui/text/text-fields";
 import { useCreateSupplier } from "@/features/inventory/suppliers/supplier.api";
-import { SupplierFormValues, SupplierSchema } from "@/features/inventory/suppliers/supplier.schema";
+import { SupplierFormValues, supplierSchema } from "@/features/inventory/suppliers/supplier.schema";
 import { fullWidthInputClass } from "@/styles/shared.classes";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
@@ -16,7 +16,7 @@ export default function NewSupplierPage() {
     const [formError, setFormError] = useState<string | null>(null);
 
     const form = useForm<SupplierFormValues>({
-        resolver: zodResolver(SupplierSchema),
+        resolver: zodResolver(supplierSchema),
         defaultValues: {
             name: "",
             address: "",

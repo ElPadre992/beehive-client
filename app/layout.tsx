@@ -1,5 +1,7 @@
 import { AppSidebar } from "@/components/ui/app-sidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
+import { InventoryItemRealtimeWrapper } from "@/features/inventory/items/components/inventory-items-realtime-wrapper";
+import { SuppliersRealtimeWrapper } from "@/features/inventory/suppliers/components/suppliers-realtime-wrapper";
 import ReactQueryProvider from "@/providers/react-query-provider";
 import { RealtimeProvider } from "@/providers/realtime-provider";
 import type { Metadata } from "next";
@@ -31,7 +33,14 @@ export default async function RootLayout({
 
             {/* Page content */}
             <main className="flex p-6 w-full bg-zinc-50 text-gray-900">
-              <ReactQueryProvider>{children}</ReactQueryProvider>
+
+              <ReactQueryProvider>
+                {/* client hooks mounted here */}
+                <InventoryItemRealtimeWrapper />
+                <SuppliersRealtimeWrapper />
+
+                {children}
+              </ReactQueryProvider>
             </main>
           </SidebarProvider>
         </RealtimeProvider>

@@ -9,20 +9,42 @@ export function useInventoryItemsRealtime() {
     const queryClient = useQueryClient();
 
     useEffect(() => {
-        const invalidate = () => {
+        console.log("Socket connected:", socket.connected);
+
+        const onCreated = () => {
             queryClient.invalidateQueries({
                 queryKey: ["/inventory/items"],
             });
         };
 
-        socket.on("itemCreated", invalidate);
-        socket.on("itemUpdated", invalidate);
-        socket.on("itemDeleted", invalidate);
+        const onUpdated = (item: { id: number }) => {
+            queryClient.invalidateQueries({
+                queryKey: ["/inventory/items"],
+            });
+
+            queryClient.invalidateQueries({
+                queryKey: ["/inventory/items", item.id],
+            });
+        };
+
+        const onDeleted = (id: number) => {
+            queryClient.invalidateQueries({
+                queryKey: ["/inventory/items"],
+            });
+
+            queryClient.removeQueries({
+                queryKey: ["/inventory/items", id],
+            });
+        };
+
+        socket.on("itemCreated", onCreated);
+        socket.on("itemUpdated", onUpdated);
+        socket.on("itemDeleted", onDeleted);
 
         return () => {
-            socket.off("itemCreated", invalidate);
-            socket.off("itemUpdated", invalidate);
-            socket.off("itemDeleted", invalidate);
+            socket.off("itemCreated", onCreated);
+            socket.off("itemUpdated", onUpdated);
+            socket.off("itemDeleted", onDeleted);
         };
     }, [socket, queryClient]);
 }

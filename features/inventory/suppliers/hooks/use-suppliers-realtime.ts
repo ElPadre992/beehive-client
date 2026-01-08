@@ -9,18 +9,42 @@ export function useSuppliersRealtime() {
     const queryClient = useQueryClient();
 
     useEffect(() => {
-        const invalidate = () => {
+        console.log("Socket connected:", socket.connected);
+
+        const onCreated = () => {
             queryClient.invalidateQueries({
                 queryKey: ["/inventory/suppliers"],
             });
         };
 
-        socket.on("supplierCreated", invalidate);
-        socket.on("supplierDeleted", invalidate);
+        const onUpdated = (supplier: { id: number }) => {
+            queryClient.invalidateQueries({
+                queryKey: ["/inventory/suppliers"],
+            });
+
+            queryClient.invalidateQueries({
+                queryKey: ["/inventory/suppliers", supplier.id],
+            });
+        };
+
+        const onDeleted = (id: number) => {
+            queryClient.invalidateQueries({
+                queryKey: ["/inventory/suppliers"],
+            });
+
+            queryClient.removeQueries({
+                queryKey: ["/inventory/suppliers", id],
+            });
+        };
+
+        socket.on("supplierCreated", onCreated);
+        socket.on("supplierUpdated", onUpdated);
+        socket.on("supplierDeleted", onDeleted);
 
         return () => {
-            socket.off("supplierCreated", invalidate);
-            socket.off("supplierDeleted", invalidate);
+            socket.off("supplierCreated", onCreated);
+            socket.off("supplierUpdated", onUpdated);
+            socket.off("supplierDeleted", onDeleted);
         };
     }, [socket, queryClient]);
 }

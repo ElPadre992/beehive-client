@@ -11,7 +11,7 @@ import { errorClass, fullWidthInputClass } from "@/styles/shared.classes";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
 export default function EditItemPage() {
@@ -44,10 +44,10 @@ export default function EditItemPage() {
         enabled: Number.isFinite(itemId),
     })
 
-    const hasInitialized = useRef(false);
+    const isDirty = form.formState.isDirty;
 
     useEffect(() => {
-        if (!item || hasInitialized.current) return;
+        if (!item || isDirty) return;
 
         form.reset({
             sku: item.sku,
@@ -58,9 +58,7 @@ export default function EditItemPage() {
             minQuantity: item.minQuantity,
             maxQuantity: item.maxQuantity,
         });
-
-        hasInitialized.current = true;
-    }, [item, form]);
+    }, [item, form, isDirty]);
 
     const updateMutation = useUpdateInventoryItem();
 

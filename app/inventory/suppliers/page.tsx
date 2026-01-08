@@ -6,7 +6,6 @@ import { Pagination } from "@/components/ui/pagination";
 import { HeaderField } from "@/components/ui/text/text-fields";
 import SuppliersDropdownMenu from "@/features/inventory/suppliers/components/dropdown-menu";
 import { useSuppliersList } from "@/features/inventory/suppliers/hooks/use-suppliers-list";
-import { useSuppliersRealtime } from "@/features/inventory/suppliers/hooks/use-suppliers-realtime";
 import { useDeleteSupplier } from "@/features/inventory/suppliers/supplier.api";
 import { supplierFilterConfig } from "@/features/inventory/suppliers/supplier.filters";
 import { Supplier } from "@/features/inventory/suppliers/supplier.schema";
@@ -52,8 +51,6 @@ function InventoryTable({ items, isLoading, onDelete, columnStyle }: InventoryTa
 }
 
 export default function Suppliers() {
-    useSuppliersRealtime();
-
     const {
         data,
         isLoading,

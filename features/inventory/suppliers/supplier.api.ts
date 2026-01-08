@@ -1,4 +1,4 @@
-import { Supplier, SupplierFormValues, SupplierSchema } from "@/features/inventory/suppliers/supplier.schema";
+import { Supplier, SupplierFormValues, supplierSchema, supplierUpdateSchema, SupplierUpdateValues } from "@/features/inventory/suppliers/supplier.schema";
 import { apiFetch } from "@/lib/api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
@@ -27,13 +27,27 @@ export const SupplierAPI = {
 
     create: (supplier: SupplierFormValues) => {
         // Optional extra validation on API side
-        const parsed = SupplierSchema.safeParse(supplier)
+        const parsed = supplierSchema.safeParse(supplier)
         if (!parsed.success) {
             throw new Error(parsed.error.issues.map(issue => issue.message).join(", "))
         }
 
         return apiFetch<Supplier>("/inventory/suppliers", {
             method: "POST",
+            body: JSON.stringify(parsed.data),
+        })
+    },
+
+    update: async (id: number, supplier: SupplierUpdateValues) => {
+        const parsed = supplierUpdateSchema.safeParse(supplier)
+        if (!parsed.success) {
+            throw new Error(
+                parsed.error.issues.map(issue => issue.message).join(", ")
+            )
+        }
+
+        return apiFetch<Supplier>(`/inventory/suppliers/${id}`, {
+            method: "PATCH",
             body: JSON.stringify(parsed.data),
         })
     },
@@ -61,6 +75,20 @@ export const useCreateSupplier = () => {
     })
 }
 
+type SupplierPayload = {
+    id: number
+    data: SupplierUpdateValues
+}
+
+export const useUpdateSupplier = () => {
+    return useMutation<Supplier, Error, SupplierPayload>({
+        mutationFn: ({ id, data }) =>
+            SupplierAPI.update(id, data),
+
+        onError: (error) => console.error("Failed to update supplier:", error.message),
+    })
+}
+
 export const useDeleteSupplier = () => {
     const queryClient = useQueryClient()
 
@@ -71,6 +99,6 @@ export const useDeleteSupplier = () => {
                 queryKey: ["/inventory/suppliers"],
             });
         },
-        onError: (error) => console.error("Failed to delete item:", error.message),
+        onError: (error) => console.error("Failed to delete supplier:", error.message),
     })
 }

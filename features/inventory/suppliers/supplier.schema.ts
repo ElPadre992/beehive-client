@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { SupplierContactApi, SupplierContactInput } from "./supplier-contact.schema";
 
-export const SupplierSchema = z
+export const supplierSchema = z
     .object({
         name: z.string().min(1, "Company name is required"),
         address: z.string().optional(),
@@ -30,9 +30,15 @@ export type SupplierApi = z.infer<
 >
 
 export type SupplierFormValues = z.infer<
-    typeof SupplierSchema
+    typeof supplierSchema
 >
 
 export type Supplier = SupplierApi & {
     id: number
 }
+
+export type SupplierUpdateValues = z.infer<
+    typeof supplierUpdateSchema
+>
+
+export const supplierUpdateSchema = supplierSchema.partial()

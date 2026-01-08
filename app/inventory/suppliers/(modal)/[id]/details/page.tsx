@@ -14,7 +14,7 @@ export default function SupplierDetailsPage() {
     const router = useRouter();
 
     const { data: supplier, isLoading, error } = useQuery({
-        queryKey: ["/inventory/suppliers/", supplierId],
+        queryKey: ["/inventory/suppliers", supplierId],
         queryFn: () => SupplierAPI.getById(supplierId!),
         enabled: Number.isFinite(supplierId),
     })
