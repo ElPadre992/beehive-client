@@ -12,7 +12,7 @@ export const compactButtonClass = "border rounded-md px-3 py-2 text-sm w-20 text
 
 export const tableClass = "w-full border rounded-md overflow-hidden text-sm"
 export const tableHeaderClass = "hidden md:grid gap-4 px-3 py-2 border-b font-semibold bg-muted-foreground text-white"
-export const tableRowClass = "gap-4 px-3 py-2 border-b items-center"
+export const tableRowClass = "gap-4 px-3 py-1 border-b items-center"
 
 // ***************
 // FORM FIELDS
