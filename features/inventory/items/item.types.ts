@@ -51,6 +51,7 @@ export enum SortValues {
     SKU = "sku",
     CATEGORY = "category",
     QUANTITY = "quantity",
+    STOCK_STATUS = "stockLevel",
 }
 
 export const SortValuesLabel: Record<SortValues, string> = {
@@ -58,6 +59,7 @@ export const SortValuesLabel: Record<SortValues, string> = {
     [SortValues.SKU]: "SKU",
     [SortValues.CATEGORY]: "Category",
     [SortValues.QUANTITY]: "Quantity",
+    [SortValues.STOCK_STATUS]: "Stock Status",
 };
 
 export interface InventoryFilters {
